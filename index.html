@@ -22,10 +22,28 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Optional text shadow for better visibility */
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var countdownElement = document.querySelector('big');
+            var seconds = 10;
+
+            function updateCountdown() {
+                countdownElement.textContent = seconds + " seconds remaining";
+                seconds--;
+
+                if (seconds < 0) {
+                    clearInterval(interval);
+                    countdownElement.textContent = "Time's up!";
+                }
+            }
+
+            var interval = setInterval(updateCountdown, 1000); // Update every 1000 milliseconds (1 second)
+        });
+    </script>
 </head>
 
 <body>
-    <big>Bomboclaat</big>
+    <big>10 seconds remaining</big>
 </body>
 
 </html>
