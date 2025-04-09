@@ -99,14 +99,18 @@
         <div class="control">
             <label>Color Scheme:</label>
             <select id="colorScheme">
-                <option value="blue">Blue</option>
-                <option value="green">Green</option>
-                <option value="yellow">Yellow</option>
-                <option value="red">Red</option>
-                <option value="purple">Purple</option>
-                <option value="cyan">Cyan</option>
                 <option value="rainbow" selected>Rainbow</option>
-                <option value="white">White</option>
+                <option value="oceanDepth">Ocean Depth</option>
+                <option value="sunsetFire">Sunset Fire</option>
+                <option value="cosmicNebula">Cosmic Nebula</option>
+                <option value="jungleGreen">Jungle Green</option>
+                <option value="electroPlasma">Electro Plasma</option>
+                <option value="heatmap">Heat Map</option>
+                <option value="starryNight">Starry Night</option>
+                <option value="neonSynthwave">Neon Synthwave</option>
+                <option value="tropicalParadise">Tropical Paradise</option>
+                <option value="galaxyCluster">Galaxy Cluster</option>
+                <option value="auroraPolaris">Aurora Polaris</option>
             </select>
         </div>
         <div class="control">
@@ -165,31 +169,199 @@
             
             // Color maps for different schemes
             const colorMaps = {
-                blue: (intensity) => {
-                    return [0, 0, intensity * 255, 255];
-                },
-                green: (intensity) => {
-                    return [0, intensity * 255, 0, 255];
-                },
-                yellow: (intensity) => {
-                    return [intensity * 255, intensity * 255, 0, 255];
-                },
-                red: (intensity) => {
-                    return [intensity * 255, 0, 0, 255];
-                },
-                purple: (intensity) => {
-                    return [intensity * 200, 0, intensity * 255, 255];
-                },
-                cyan: (intensity) => {
-                    return [0, intensity * 255, intensity * 255, 255];
-                },
                 rainbow: (intensity, angle) => {
                     // Rainbow based on agent angle
                     const hue = ((angle / (Math.PI * 2)) * 360) % 360;
                     return hslToRgb(hue, 1, intensity * 0.5);
                 },
-                white: (intensity) => {
-                    return [intensity * 255, intensity * 255, intensity * 255, 255];
+                oceanDepth: (intensity, angle) => {
+                    // Gradient from deep blue to cyan to white
+                    const progress = (Math.cos(angle) + 1) / 2; // 0 to 1 based on angle
+                    if (progress < 0.5) {
+                        // Deep blue to cyan (0-0.5)
+                        const mix = progress * 2; // 0 to 1
+                        const r = 0;
+                        const g = Math.floor(mix * intensity * 255);
+                        const b = Math.floor(intensity * 255);
+                        return [r, g, b, 255];
+                    } else {
+                        // Cyan to white (0.5-1)
+                        const mix = (progress - 0.5) * 2; // 0 to 1
+                        const r = Math.floor(mix * intensity * 255);
+                        const g = Math.floor(intensity * 255);
+                        const b = Math.floor(intensity * 255);
+                        return [r, g, b, 255];
+                    }
+                },
+                sunsetFire: (intensity, angle) => {
+                    // Gradient from deep red to orange to yellow
+                    const progress = (Math.sin(angle) + 1) / 2; // 0 to 1 based on angle
+                    const r = Math.floor(intensity * 255);
+                    const g = Math.floor(progress * intensity * 255);
+                    const b = 0;
+                    return [r, g, b, 255];
+                },
+                cosmicNebula: (intensity, angle) => {
+                    // Purple to pink to blue
+                    const progress = (Math.sin(angle * 2) + 1) / 2; // 0 to 1 with double frequency
+                    
+                    if (progress < 0.33) {
+                        // Purple to pink (0-0.33)
+                        const mix = progress * 3; // 0 to 1
+                        const r = Math.floor((170 + mix * 85) * intensity);
+                        const g = Math.floor(mix * 50 * intensity);
+                        const b = Math.floor((210 + mix * 45) * intensity);
+                        return [r, g, b, 255];
+                    } else if (progress < 0.66) {
+                        // Pink to blue (0.33-0.66)
+                        const mix = (progress - 0.33) * 3; // 0 to 1
+                        const r = Math.floor((255 - mix * 255) * intensity);
+                        const g = Math.floor((50 - mix * 50) * intensity);
+                        const b = Math.floor(255 * intensity);
+                        return [r, g, b, 255];
+                    } else {
+                        // Blue to purple (0.66-1)
+                        const mix = (progress - 0.66) * 3; // 0 to 1
+                        const r = Math.floor((0 + mix * 170) * intensity);
+                        const g = Math.floor(0 * intensity);
+                        const b = Math.floor(255 * intensity);
+                        return [r, g, b, 255];
+                    }
+                },
+                jungleGreen: (intensity, angle) => {
+                    // Dark green to light green to yellow
+                    const progress = (Math.cos(angle * 1.5) + 1) / 2; // 0 to 1 
+                    
+                    const r = Math.floor(progress * progress * intensity * 255);
+                    const g = Math.floor((0.5 + progress * 0.5) * intensity * 255);
+                    const b = Math.floor((1 - progress) * 0.3 * intensity * 255);
+                    return [r, g, b, 255];
+                },
+                electroPlasma: (intensity, angle) => {
+                    // Electric blue to white to purple
+                    const wave = Math.sin(angle * 3); // Oscillating value for electric effect
+                    const progress = (Math.sin(angle) + 1) / 2; // 0 to 1 based on angle
+                    
+                    const waveEffect = Math.abs(wave) * 0.3 + 0.7; // Boost intensity for electric effect
+                    
+                    const r = Math.floor((progress * 0.7 + 0.3) * intensity * 255 * waveEffect);
+                    const g = Math.floor((1 - progress) * 0.8 * intensity * 255 * waveEffect);
+                    const b = Math.floor(intensity * 255 * waveEffect);
+                    return [r, g, b, 255];
+                },
+                heatmap: (intensity, angle) => {
+                    // Classic heat map: black to red to yellow to white
+                    if (intensity < 0.33) {
+                        // Black to red
+                        const adj = intensity * 3;
+                        return [Math.floor(adj * 255), 0, 0, 255];
+                    } else if (intensity < 0.66) {
+                        // Red to yellow
+                        const adj = (intensity - 0.33) * 3;
+                        return [255, Math.floor(adj * 255), 0, 255];
+                    } else {
+                        // Yellow to white
+                        const adj = (intensity - 0.66) * 3;
+                        return [255, 255, Math.floor(adj * 255), 255];
+                    }
+                },
+                starryNight: (intensity, angle) => {
+                    // Deep blue with speckling of stars
+                    const twinkle = Math.abs(Math.sin(angle * 5)) * (Math.random() * 0.5 + 0.5);
+                    const starEffect = Math.pow(twinkle, 3) * 0.8 + 0.2;
+                    
+                    const r = Math.floor(intensity * 40 * starEffect);
+                    const g = Math.floor(intensity * 70 * starEffect);
+                    const b = Math.floor(intensity * (120 + 135 * starEffect));
+                    return [r, g, b, 255];
+                },
+                neonSynthwave: (intensity, angle) => {
+                    // 80s synthwave aesthetic with neon pink and blue
+                    const cycle = (Math.sin(angle * 2) + 1) / 2;
+                    
+                    // Pink to blue to purple cycling
+                    const r = Math.floor((0.8 - 0.6 * cycle) * intensity * 255);
+                    const g = Math.floor((0.2 * Math.sin(angle * 5)) * intensity * 255);
+                    const b = Math.floor((0.5 + 0.5 * (1-cycle)) * intensity * 255);
+                    return [r, g, b, 255];
+                },
+                tropicalParadise: (intensity, angle) => {
+                    // Blend of turquoise, coral, and yellow
+                    const cycle = (Math.sin(angle * 1.5) + 1) / 2;
+                    
+                    // Turquoise to coral to yellow
+                    if (cycle < 0.33) {
+                        // Turquoise
+                        const mix = cycle * 3;
+                        const r = Math.floor((64 + mix * 191) * intensity);
+                        const g = Math.floor((224 - mix * 114) * intensity);
+                        const b = Math.floor((208 - mix * 108) * intensity);
+                        return [r, g, b, 255];
+                    } else if (cycle < 0.66) {
+                        // Coral to yellow
+                        const mix = (cycle - 0.33) * 3;
+                        const r = Math.floor((255) * intensity);
+                        const g = Math.floor((110 + mix * 145) * intensity);
+                        const b = Math.floor((100 - mix * 100) * intensity);
+                        return [r, g, b, 255];
+                    } else {
+                        // Yellow to turquoise
+                        const mix = (cycle - 0.66) * 3;
+                        const r = Math.floor((255 - mix * 191) * intensity);
+                        const g = Math.floor((255 - mix * 31) * intensity);
+                        const b = Math.floor((0 + mix * 208) * intensity);
+                        return [r, g, b, 255];
+                    }
+                },
+                galaxyCluster: (intensity, angle) => {
+                    // Space-inspired purple, blue and pink with star-like effects
+                    const baseAngle = angle % (Math.PI / 2);
+                    const normalized = baseAngle / (Math.PI / 2); // 0 to 1
+                    
+                    // Create a spiral galaxy effect with arms
+                    const armEffect = Math.pow(Math.sin(angle * 4), 2) * 0.5 + 0.5;
+                    const distance = Math.random() * armEffect;
+                    
+                    if (distance < 0.3) {
+                        // Galaxy core (bright)
+                        const r = Math.floor((180 + 75 * normalized) * intensity);
+                        const g = Math.floor((130 + 50 * (1-normalized)) * intensity);
+                        const b = Math.floor((220 + 35 * normalized) * intensity);
+                        return [r, g, b, 255];
+                    } else {
+                        // Galaxy arms (darker with stars)
+                        const r = Math.floor((60 + 100 * normalized) * intensity);
+                        const g = Math.floor((20 + 50 * normalized) * intensity);
+                        const b = Math.floor((80 + 100 * normalized) * intensity);
+                        return [r, g, b, 255];
+                    }
+                },
+                auroraPolaris: (intensity, angle) => {
+                    // Northern lights effect with greens and blues flowing into purples
+                    const wave = Math.sin(angle * 3 + Math.cos(angle * 2));
+                    const wavePos = (wave + 1) / 2; // 0 to 1
+                    
+                    if (wavePos < 0.4) {
+                        // Green aurora
+                        const r = Math.floor(0 * intensity);
+                        const g = Math.floor((150 + 105 * wavePos * 2.5) * intensity);
+                        const b = Math.floor((50 + 50 * wavePos * 2.5) * intensity);
+                        return [r, g, b, 255];
+                    } else if (wavePos < 0.7) {
+                        // Teal to blue transition
+                        const mix = (wavePos - 0.4) * 3.33;
+                        const r = Math.floor((0) * intensity);
+                        const g = Math.floor((255 - mix * 200) * intensity);
+                        const b = Math.floor((100 + mix * 155) * intensity);
+                        return [r, g, b, 255];
+                    } else {
+                        // Blue to purple
+                        const mix = (wavePos - 0.7) * 3.33;
+                        const r = Math.floor((0 + mix * 100) * intensity);
+                        const g = Math.floor((55 - mix * 55) * intensity);
+                        const b = Math.floor((255) * intensity);
+                        return [r, g, b, 255];
+                    }
                 }
             };
             
@@ -465,14 +637,8 @@
                 
                 for (let i = 0; i < agentCount; i++) {
                     // Set color based on scheme
-                    if (config.colorScheme === 'rainbow') {
-                        const hue = ((agentAngle[i] / (Math.PI * 2)) * 360) % 360;
-                        agentCtx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-                    } else {
-                        // Using the same color as the trail but at full intensity
-                        const color = colorMaps[config.colorScheme](1.0);
-                        agentCtx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
-                    }
+                    const color = colorMaps[config.colorScheme](1.0, agentAngle[i]);
+                    agentCtx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
                     
                     agentCtx.beginPath();
                     agentCtx.arc(agentX[i], agentY[i], config.agentSize, 0, Math.PI * 2);
