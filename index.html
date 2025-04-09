@@ -452,11 +452,13 @@
                         const radius = Math.min(trailCanvas.width, trailCanvas.height) * 0.3;
                         for (let i = 0; i < agentCount; i++) {
                             const angle = Math.random() * Math.PI * 2;
-                            const r = radius * Math.sqrt(Math.random()); // Distribute evenly within circle
+                            // Use square root to distribute evenly within circle area
+                            // Without sqrt, points would cluster toward center
+                            const r = radius * Math.sqrt(Math.random());
                             agentX[i] = centerX + r * Math.cos(angle);
                             agentY[i] = centerY + r * Math.sin(angle);
-                            // Angle points outward from center
-                            agentAngle[i] = Math.atan2(agentY[i] - centerY, agentX[i] - centerX);
+                            // Point in random directions (not just outward) for more exploration
+                            agentAngle[i] = Math.random() * Math.PI * 2;
                             agentSpecies[i] = Math.floor(Math.random() * 5);
                         }
                         break;
@@ -473,10 +475,12 @@
                         
                     case 'explosion':
                         for (let i = 0; i < agentCount; i++) {
-                            // All agents start at center but point outward
-                            agentX[i] = centerX;
-                            agentY[i] = centerY;
-                            agentAngle[i] = Math.random() * Math.PI * 2;
+                            // All agents start at center but point outward radially
+                            agentX[i] = centerX + (Math.random() * 10 - 5); // Tiny random offset
+                            agentY[i] = centerY + (Math.random() * 10 - 5); // to prevent exact center
+                            
+                            // Calculate angle pointing away from center
+                            agentAngle[i] = Math.atan2(agentY[i] - centerY, agentX[i] - centerX);
                             agentSpecies[i] = Math.floor(Math.random() * 5);
                         }
                         break;
