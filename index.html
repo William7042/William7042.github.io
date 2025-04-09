@@ -534,12 +534,7 @@
                 const index = (iy * trailCanvas.width + ix) * 4;
                 
                 // Get color based on current scheme
-                let color;
-                if (config.colorScheme === 'rainbow') {
-                    color = colorMaps[config.colorScheme](intensity, angle);
-                } else {
-                    color = colorMaps[config.colorScheme](intensity);
-                }
+                let color = colorMaps[config.colorScheme](intensity, angle);
                 
                 // Set color (averaging with existing values to create blending)
                 trailMap.data[index] = Math.min(255, trailMap.data[index] + color[0] * config.trailStrength);
