@@ -482,29 +482,32 @@
                                 case 0: // Top-left
                                     agentX[i] = Math.random() * (trailCanvas.width * 0.2);
                                     agentY[i] = Math.random() * (trailCanvas.height * 0.2);
+                                    // Point outward (southeast direction with some randomness)
+                                    agentAngle[i] = Math.PI / 4 + (Math.random() - 0.5) * 0.5;
                                     break;
                                 case 1: // Top-right
                                     agentX[i] = trailCanvas.width - Math.random() * (trailCanvas.width * 0.2);
                                     agentY[i] = Math.random() * (trailCanvas.height * 0.2);
+                                    // Point outward (southwest direction with some randomness)
+                                    agentAngle[i] = Math.PI * 3/4 + (Math.random() - 0.5) * 0.5;
                                     break;
                                 case 2: // Bottom-left
                                     agentX[i] = Math.random() * (trailCanvas.width * 0.2);
                                     agentY[i] = trailCanvas.height - Math.random() * (trailCanvas.height * 0.2);
+                                    // Point outward (northeast direction with some randomness)
+                                    agentAngle[i] = Math.PI * 7/4 + (Math.random() - 0.5) * 0.5;
                                     break;
                                 case 3: // Bottom-right
                                     agentX[i] = trailCanvas.width - Math.random() * (trailCanvas.width * 0.2);
                                     agentY[i] = trailCanvas.height - Math.random() * (trailCanvas.height * 0.2);
+                                    // Point outward (northwest direction with some randomness)
+                                    agentAngle[i] = Math.PI * 5/4 + (Math.random() - 0.5) * 0.5;
                                     break;
                             }
                             
-                            // Point towards the center of the canvas
-                            agentAngle[i] = Math.atan2(centerY - agentY[i], centerX - agentX[i]);
-                            // Add some randomness to the angle
-                            agentAngle[i] += (Math.random() - 0.5) * 0.5;
                             agentSpecies[i] = Math.floor(Math.random() * 5);
                         }
                         break;
-                        
                     case 'random':
                     default:
                         for (let i = 0; i < agentCount; i++) {
