@@ -3,1046 +3,606 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>William Ma | Creative Developer</title>
+    <title>Slime Mold Pheromone Simulation</title>
     <style>
-        /* Base styles */
-        :root {
-            --primary: #5000ff;
-            --secondary: #00ddff;
-            --dark: #0a0a14;
-            --light: #ffffff;
-            --accent: #ff00aa;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html {
-            scroll-behavior: smooth;
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary) var(--dark);
-        }
-        
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--dark);
-            color: var(--light);
-            line-height: 1.6;
-            overflow-x: hidden;
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: Arial, sans-serif;
         }
-        
-        /* Navbar */
-        .navbar {
-            position: fixed;
+        canvas {
+            display: block;
+        }
+        #agentCanvas {
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 10%;
-            z-index: 1000;
-            transition: all 0.3s ease-in-out;
         }
-        
-        .navbar.scrolled {
-            background: rgba(10, 10, 20, 0.9);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
-            padding: 1rem 10%;
-        }
-        
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -1px;
-            position: relative;
-            text-decoration: none;
-        }
-        
-        .logo::after {
-            content: '';
+        #controls {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.3s ease-in-out;
-        }
-        
-        .logo:hover::after {
-            transform: scaleX(1);
-            transform-origin: left;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-        
-        .nav-link {
-            color: var(--light);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 1.1rem;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.3s ease-in-out;
-        }
-        
-        .nav-link:hover {
-            color: var(--secondary);
-        }
-        
-        .nav-link:hover::after {
-            transform: scaleX(1);
-            transform-origin: left;
-        }
-        
-        .nav-link.active::after {
-            transform: scaleX(1);
-        }
-        
-        .menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--light);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        /* Hero section */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 10%;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            z-index: 1;
-            max-width: 1000px;
-        }
-        
-        .hero-title {
-            font-size: 4.5rem;
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(45deg, var(--light), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 5px 30px rgba(0, 221, 255, 0.3);
-            animation: fadeIn 1s ease-out forwards;
-        }
-        
-        .profession {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            color: rgba(255, 255, 255, 0.8);
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            position: relative;
-            padding: 0 1rem;
-            animation: fadeIn 1s ease-out 0.2s forwards;
-            opacity: 0;
-        }
-        
-        .profession::before, 
-        .profession::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 30px;
-            height: 1px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-        }
-        
-        .profession::before {
-            left: -20px;
-        }
-        
-        .profession::after {
-            right: -20px;
-        }
-        
-        .hero-text {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin-bottom: 3rem;
-            color: rgba(255, 255, 255, 0.7);
-            animation: fadeIn 1s ease-out 0.4s forwards;
-            opacity: 0;
-        }
-        
-        .cta-btn {
-            display: inline-block;
-            padding: 1rem 2.5rem;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
             color: white;
-            text-decoration: none;
-            font-weight: 600;
-            border-radius: 50px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-            box-shadow: 0 5px 20px rgba(80, 0, 255, 0.4);
-            animation: fadeIn 1s ease-out 0.6s forwards;
-            opacity: 0;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+            font-size: 12px;
         }
-        
-        .cta-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, var(--secondary), var(--primary));
-            z-index: -1;
-            transition: opacity 0.3s ease;
-            opacity: 0;
+        .control {
+            margin: 5px 0;
         }
-        
-        .cta-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(80, 0, 255, 0.6);
-        }
-        
-        .cta-btn:hover::before {
-            opacity: 1;
-        }
-        
-        /* Mouse scroll animation */
-        .scroll-down {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 1s ease-out 0.8s forwards;
-            opacity: 0;
-        }
-        
-        .mouse {
-            width: 30px;
-            height: 50px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            display: flex;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-        
-        .mouse-wheel {
-            width: 4px;
-            height: 8px;
-            background: white;
-            border-radius: 2px;
-            margin-top: 10px;
-            animation: scroll 1.5s infinite;
-        }
-        
-        @keyframes scroll {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-        }
-        
-        .scroll-text {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-        
-        /* About section */
-        .about {
-            padding: 8rem 10% 5rem;
-            position: relative;
-        }
-        
-        .section-title {
-            font-size: 3rem;
-            margin-bottom: 3rem;
-            position: relative;
-            display: inline-block;
-            background: linear-gradient(45deg, var(--light), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-        }
-        
-        .about-content {
-            display: flex;
-            gap: 5rem;
-            align-items: center;
-        }
-        
-        .about-text {
-            flex: 1;
-        }
-        
-        .about-image {
-            flex: 1;
-            position: relative;
-        }
-        
-        .about-img {
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            position: relative;
-            z-index: 1;
-        }
-        
-        .about-img-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 20px;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            top: 20px;
-            left: 20px;
-            z-index: 0;
-        }
-        
-        .skills-title {
-            font-size: 1.5rem;
-            margin: 2rem 0 1rem;
-            color: var(--secondary);
-        }
-        
-        .skills-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .skill {
-            padding: 0.5rem 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-        
-        .skill:hover {
-            background: linear-gradient(45deg, rgba(80, 0, 255, 0.2), rgba(0, 221, 255, 0.2));
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            border-color: rgba(0, 221, 255, 0.3);
-        }
-        
-        /* Portfolio section */
-        .portfolio {
-            padding: 5rem 10%;
-            position: relative;
-        }
-        
-        .portfolio-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        
-        .portfolio-item {
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
-            height: 300px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .portfolio-item:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .portfolio-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: all 0.5s ease;
-        }
-        
-        .portfolio-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to top, rgba(10, 10, 20, 0.9), transparent);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 2rem;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-        
-        .portfolio-item:hover .portfolio-overlay {
-            opacity: 1;
-        }
-        
-        .portfolio-item:hover .portfolio-img {
-            transform: scale(1.1);
-        }
-        
-        .portfolio-title {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .portfolio-category {
-            font-size: 0.9rem;
-            color: var(--secondary);
-            margin-bottom: 1rem;
-        }
-        
-        .portfolio-link {
-            display: inline-block;
-            padding: 0.5rem 1.5rem;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            width: fit-content;
-        }
-        
-        .portfolio-link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* Contact section */
-        .contact {
-            padding: 5rem 10% 8rem;
-            position: relative;
-            background: linear-gradient(to bottom, var(--dark), rgba(10, 10, 20, 0.9));
-        }
-        
-        .contact-content {
-            display: flex;
-            gap: 4rem;
-            margin-top: 3rem;
-        }
-        
-        .contact-info {
-            flex: 1;
-        }
-        
-        .contact-form {
-            flex: 1;
-        }
-        
-        .contact-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .contact-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-size: 1.2rem;
-        }
-        
-        .contact-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 0.3rem;
-        }
-        
-        .contact-text {
-            font-size: 1.1rem;
-        }
-        
-        .contact-text a {
-            color: var(--light);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        
-        .contact-text a:hover {
-            color: var(--secondary);
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        
-        .social-link {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: var(--light);
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-        
-        .social-link:hover {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: var(--light);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--secondary);
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        textarea.form-input {
-            resize: vertical;
-            min-height: 150px;
-        }
-        
-        .form-submit {
-            display: inline-block;
-            padding: 1rem 2.5rem;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
+        button {
+            background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 3px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            margin: 5px;
         }
-        
-        .form-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        button:hover {
+            background-color: #45a049;
         }
-        
-        /* Footer */
-        .footer {
-            padding: 2rem 10%;
-            background: rgba(5, 5, 10, 0.8);
-            text-align: center;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.5);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .reveal {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.8s ease;
-        }
-        
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        /* Responsive styles */
-        @media screen and (max-width: 1024px) {
-            .hero-title {
-                font-size: 4rem;
-            }
-            
-            .about-content {
-                flex-direction: column;
-                gap: 3rem;
-            }
-            
-            .about-image {
-                order: -1;
-                max-width: 500px;
-                margin: 0 auto;
-            }
-        }
-        
-        @media screen and (max-width: 768px) {
-            .navbar {
-                padding: 1.5rem 5%;
-            }
-            
-            .navbar.scrolled {
-                padding: 1rem 5%;
-            }
-            
-            .nav-links {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 70%;
-                height: 100vh;
-                background: rgba(10, 10, 20, 0.95);
-                backdrop-filter: blur(10px);
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                gap: 2rem;
-                transition: right 0.5s ease;
-                z-index: 2;
-            }
-            
-            .nav-links.active {
-                right: 0;
-            }
-            
-            .menu-btn {
-                display: block;
-                z-index: 3;
-            }
-            
-            .hero {
-                padding: 0 5%;
-            }
-            
-            .hero-title {
-                font-size: 3rem;
-            }
-            
-            .profession {
-                font-size: 1.2rem;
-            }
-            
-            .about, .portfolio, .contact {
-                padding-left: 5%;
-                padding-right: 5%;
-            }
-            
-            .portfolio-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
-            
-            .contact-content {
-                flex-direction: column;
-            }
-        }
-        
-        @media screen and (max-width: 480px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-            
-            .profession {
-                font-size: 1rem;
-                letter-spacing: 3px;
-            }
-            
-            .section-title {
-                font-size: 2.5rem;
-            }
-        }
-        
-        /* Background */
-        .bg-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: -1;
-            background: radial-gradient(circle at top right, rgba(80, 0, 255, 0.2), transparent 50%),
-                        radial-gradient(circle at bottom left, rgba(0, 221, 255, 0.2), transparent 50%);
-        }
-        
-        .bg-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            overflow: hidden;
-        }
-        
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            opacity: 0.3;
-            animation: float var(--duration) linear infinite;
-        }
-        
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-            }
-            100% {
-                transform: translateY(-100vh) rotate(720deg);
-            }
+        select, input {
+            padding: 3px;
+            border-radius: 3px;
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
         }
     </style>
 </head>
 <body>
-    <!-- Background effects -->
-    <div class="bg-gradient"></div>
-    <div class="bg-particles" id="particles"></div>
-    
-    <!-- Navigation -->
-    <nav class="navbar">
-        <a href="#" class="logo">William Ma</a>
-        <button class="menu-btn">☰</button>
-        <ul class="nav-links">
-            <li><a href="#home" class="nav-link active">Home</a></li>
-            <li><a href="#about" class="nav-link">About</a></li>
-            <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
-            <li><a href="#contact" class="nav-link">Contact</a></li>
-        </ul>
-    </nav>
-    
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <h1 class="hero-title">William Ma</h1>
-            <p class="profession">Designer & Developer</p>
-            <p class="hero-text">I create stunning digital experiences that combine innovative design with cutting-edge technology. Let's bring your vision to life with creativity and precision.</p>
-            <a href="#contact" class="cta-btn">Get In Touch</a>
+    <canvas id="trailCanvas"></canvas>
+    <canvas id="agentCanvas"></canvas>
+
+    <div id="controls">
+        <h2>Slime Mold Simulation</h2>
+        <div class="control">
+            <label>Agent Count: <span id="agentCountValue">10000</span></label>
+            <input type="range" id="agentCount" min="1000" max="100000" step="1000" value="10000">
         </div>
-        <div class="scroll-down">
-            <div class="mouse">
-                <div class="mouse-wheel"></div>
-            </div>
-            <p class="scroll-text">Scroll down</p>
+        <div class="control">
+            <label>Agent Size: <span id="agentSizeValue">1</span></label>
+            <input type="range" id="agentSize" min="0.5" max="3" step="0.1" value="1">
         </div>
-    </section>
-    
-    <!-- About Section -->
-    <section class="about" id="about">
-        <h2 class="section-title reveal">About Me</h2>
-        <div class="about-content">
-            <div class="about-text">
-                <p class="reveal">Hello! I'm William, a passionate designer and developer with over 5 years of experience creating immersive digital experiences. I believe in combining aesthetics with functionality to deliver solutions that not only look beautiful but also solve real problems.</p>
-                <p class="reveal">My journey in the digital world started when I was 15, building simple websites for friends and family. Today, I specialize in creating user-centered digital products that stand out in today's competitive landscape.</p>
-                <h3 class="skills-title reveal">My Skills</h3>
-                <div class="skills-container reveal">
-                    <span class="skill">UI/UX Design</span>
-                    <span class="skill">Front-end Development</span>
-                    <span class="skill">JavaScript</span>
-                    <span class="skill">React</span>
-                    <span class="skill">Three.js</span>
-                    <span class="skill">WebGL</span>
-                    <span class="skill">CSS Animations</span>
-                    <span class="skill">Responsive Design</span>
-                    <span class="skill">Figma</span>
-                    <span class="skill">Adobe Creative Suite</span>
-                </div>
-            </div>
-            <div class="about-image reveal">
-                <img src="/api/placeholder/500/600" alt="William Ma" class="about-img">
-                <div class="about-img-bg"></div>
-            </div>
+        <div class="control">
+            <label>Sensor Angle: <span id="sensorAngleValue">30</span>°</label>
+            <input type="range" id="sensorAngle" min="5" max="90" value="30">
         </div>
-    </section>
-    
-    <!-- Portfolio Section -->
-    <section class="portfolio" id="portfolio">
-        <h2 class="section-title reveal">My Work</h2>
-        <div class="portfolio-grid">
-            <div class="portfolio-item reveal">
-                <img src="/api/placeholder/700/500" alt="Project 1" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3 class="portfolio-title">Neon Dreams</h3>
-                    <p class="portfolio-category">Web Design / 3D Animation</p>
-                    <a href="#" class="portfolio-link">View Project</a>
-                </div>
-            </div>
-            <div class="portfolio-item reveal">
-                <img src="/api/placeholder/701/501" alt="Project 2" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3 class="portfolio-title">Quantum UI Kit</h3>
-                    <p class="portfolio-category">UI Design / Component Library</p>
-                    <a href="#" class="portfolio-link">View Project</a>
-                </div>
-            </div>
-            <div class="portfolio-item reveal">
-                <img src="/api/placeholder/702/502" alt="Project 3" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3 class="portfolio-title">Echo Music App</h3>
-                    <p class="portfolio-category">Mobile App / UI Design</p>
-                    <a href="#" class="portfolio-link">View Project</a>
-                </div>
-            </div>
-            <div class="portfolio-item reveal">
-                <img src="/api/placeholder/703/503" alt="Project 4" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3 class="portfolio-title">Pulse Analytics</h3>
-                    <p class="portfolio-category">Dashboard Design / Data Visualization</p>
-                    <a href="#" class="portfolio-link">View Project</a>
-                </div>
-            </div>
-            <div class="portfolio-item reveal">
-                <img src="/api/placeholder/704/504" alt="Project 5" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3 class="portfolio-title">Nebula eCommerce</h3>
-                    <p class="portfolio-category">eCommerce / Web Development</p>
-                    <a href="#" class="portfolio-link">View Project</a>
-                </div>
-            </div>
-            <div class="portfolio-item reveal">
-                <img src="/api/placeholder/705/505" alt="Project 6" class="portfolio-img">
-                <div class="portfolio-overlay">
-                    <h3 class="portfolio-title">Orbit Travel</h3>
-                    <p class="portfolio-category">Booking System / UX Design</p>
-                    <a href="#" class="portfolio-link">View Project</a>
-                </div>
-            </div>
+        <div class="control">
+            <label>Sensor Distance: <span id="sensorDistanceValue">15</span></label>
+            <input type="range" id="sensorDistance" min="5" max="50" value="15">
         </div>
-    </section>
-    
-    <!-- Contact Section -->
-    <section class="contact" id="contact">
-        <h2 class="section-title reveal">Get In Touch</h2>
-        <div class="contact-content">
-            <div class="contact-info reveal">
-                <div class="contact-item">
-                    <div class="contact-icon">✉️</div>
-                    <div>
-                        <p class="contact-label">Email</p>
-                        <p class="contact-text"><a href="mailto:hello@williamma.com">hello@williamma.com</a></p>
-                    </div>
-                </div>
-                <div class="contact-item">
-                    <div class="contact-icon">📱</div>
-                    <div>
-                        <p class="contact-label">Phone</p>
-                        <p class="contact-text"><a href="tel:+12345678901">+1 (234) 567-8901</a></p>
-                    </div>
-                </div>
-                <div class="contact-item">
-                    <div class="contact-icon">📍</div>
-                    <div>
-                        <p class="contact-label">Location</p>
-                        <p class="contact-text">San Francisco, California</p>
-                    </div>
-                </div>
-                <div class="social-links">
-                    <a href="#" class="social-link">🐦</a>
-                    <a href="#" class="social-link">👨‍💼</a>
-                    <a href="#" class="social-link">📸</a>
-                    <a href="#" class="social-link">👨‍💻</a>
-                </div>
-            </div>
-            <div class="contact-form reveal">
-                <div class="input-group">
-                    <input type="text" class="form-input" placeholder="Your Name">
-                </div>
-                <div class="input-group">
-                    <input type="email" class="form-input" placeholder="Your Email">
-                </div>
-                <div class="input-group">
-                    <input type="text" class="form-input" placeholder="Subject">
-                </div>
-                <div class="input-group">
-                    <textarea class="form-input" placeholder="Your Message"></textarea>
-                </div>
-                <button type="submit" class="form-submit">Send Message</button>
-            </div>
+        <div class="control">
+            <label>Trail Strength: <span id="trailStrengthValue">0.3</span></label>
+            <input type="range" id="trailStrength" min="0.1" max="1" step="0.05" value="0.3">
         </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2025 William Ma. All Rights Reserved.</p>
-    </footer>
-    
+        <div class="control">
+            <label>Trail Evaporation: <span id="trailEvaporationValue">0.01</span></label>
+            <input type="range" id="trailEvaporation" min="0.001" max="0.05" step="0.001" value="0.01">
+        </div>
+        <div class="control">
+            <label>Turn Speed: <span id="turnSpeedValue">1</span></label>
+            <input type="range" id="turnSpeed" min="0.1" max="5" step="0.1" value="1">
+        </div>
+        <div class="control">
+            <label>Move Speed: <span id="moveSpeedValue">1</span></label>
+            <input type="range" id="moveSpeed" min="0.1" max="3" step="0.1" value="1">
+        </div>
+        <div class="control">
+            <label>Random Turn: <span id="randomTurnValue">0.1</span></label>
+            <input type="range" id="randomTurn" min="0" max="1" step="0.05" value="0.1">
+        </div>
+        <div class="control">
+            <label>Color Scheme:</label>
+            <select id="colorScheme">
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="yellow">Yellow</option>
+                <option value="red">Red</option>
+                <option value="purple">Purple</option>
+                <option value="cyan">Cyan</option>
+                <option value="rainbow" selected>Rainbow</option>
+                <option value="white">White</option>
+            </select>
+        </div>
+        <div class="control">
+            <label>Initial Pattern:</label>
+            <select id="initialPattern">
+                <option value="circle">Circle</option>
+                <option value="random" selected>Random</option>
+                <option value="center">Center</option>
+                <option value="explosion">Explosion</option>
+            </select>
+            <button id="resetBtn">Reset Simulation</button>
+        </div>
+        <div class="control">
+            <span id="fpsCounter">FPS: 60 | Agents: 10000</span>
+        </div>
+        <button id="toggleControls">Hide Controls</button>
+    </div>
+
     <script>
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
+        // Wait for document to be fully loaded before initializing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Canvas setup
+            const trailCanvas = document.getElementById('trailCanvas');
+            const agentCanvas = document.getElementById('agentCanvas');
+            const trailCtx = trailCanvas.getContext('2d', { alpha: false });
+            const agentCtx = agentCanvas.getContext('2d', { alpha: true });
+            
+            // Make canvas fullscreen
+            const updateCanvasSize = () => {
+                trailCanvas.width = window.innerWidth;
+                trailCanvas.height = window.innerHeight;
+                agentCanvas.width = window.innerWidth;
+                agentCanvas.height = window.innerHeight;
+            };
+            
+            updateCanvasSize();
+            
+            // Configuration
+            const config = {
+                agentCount: 10000,
+                agentSize: 1,
+                sensorAngle: 30 * (Math.PI / 180), // convert to radians
+                sensorDistance: 15,
+                trailStrength: 0.3,
+                trailEvaporation: 0.01,
+                turnSpeed: 1,
+                moveSpeed: 1,
+                randomTurn: 0.1,
+                colorScheme: 'rainbow',
+                initialPattern: 'random'
+            };
+            
+            // Trail map - using ImageData for efficiency
+            let trailMap;
+            let shouldInitTrailMap = true;
+            
+            // Color maps for different schemes
+            const colorMaps = {
+                blue: (intensity) => {
+                    return [0, 0, intensity * 255, 255];
+                },
+                green: (intensity) => {
+                    return [0, intensity * 255, 0, 255];
+                },
+                yellow: (intensity) => {
+                    return [intensity * 255, intensity * 255, 0, 255];
+                },
+                red: (intensity) => {
+                    return [intensity * 255, 0, 0, 255];
+                },
+                purple: (intensity) => {
+                    return [intensity * 200, 0, intensity * 255, 255];
+                },
+                cyan: (intensity) => {
+                    return [0, intensity * 255, intensity * 255, 255];
+                },
+                rainbow: (intensity, angle) => {
+                    // Rainbow based on agent angle
+                    const hue = ((angle / (Math.PI * 2)) * 360) % 360;
+                    return hslToRgb(hue, 1, intensity * 0.5);
+                },
+                white: (intensity) => {
+                    return [intensity * 255, intensity * 255, intensity * 255, 255];
+                }
+            };
+            
+            // Agents array using typed arrays for better performance
+            let agentX = new Float32Array(config.agentCount);
+            let agentY = new Float32Array(config.agentCount);
+            let agentAngle = new Float32Array(config.agentCount);
+            let agentSpecies = new Uint8Array(config.agentCount);
+            let agentCount = config.agentCount;
+            
+            // HSL to RGB conversion for rainbow mode
+            function hslToRgb(h, s, l) {
+                let r, g, b;
+            
+                if (s === 0) {
+                    r = g = b = l; // achromatic
+                } else {
+                    const hue2rgb = (p, q, t) => {
+                        if (t < 0) t += 1;
+                        if (t > 1) t -= 1;
+                        if (t < 1/6) return p + (q - p) * 6 * t;
+                        if (t < 1/2) return q;
+                        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                        return p;
+                    };
+            
+                    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                    const p = 2 * l - q;
+                    r = hue2rgb(p, q, (h / 360) + 1/3);
+                    g = hue2rgb(p, q, h / 360);
+                    b = hue2rgb(p, q, (h / 360) - 1/3);
+                }
+            
+                return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), 255];
             }
             
-            // Reveal animations on scroll
-            const reveals = document.querySelectorAll('.reveal');
-            reveals.forEach(reveal => {
-                const windowHeight = window.innerHeight;
-                const revealTop = reveal.getBoundingClientRect().top;
-                const revealPoint = 150;
-                
-                if (revealTop < windowHeight - revealPoint) {
-                    reveal.classList.add('active');
+            // Initialize trail map
+            function initializeTrailMap() {
+                if (trailCanvas.width <= 0 || trailCanvas.height <= 0) {
+                    // Canvas not ready yet, will try again
+                    shouldInitTrailMap = true;
+                    return false;
                 }
-            });
-        });
-        
-        // Mobile menu toggle
-        const menuBtn = document.querySelector('.menu-btn');
-        const navLinks = document.querySelector('.nav-links');
-        
-        menuBtn.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-            menuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-        });
-        
-        // Close mobile menu when clicking a nav link
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function() {
-                navLinks.classList.remove('active');
-                menuBtn.textContent = '☰';
-            });
-        });
-        
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
                 
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
+                try {
+                    trailMap = trailCtx.createImageData(trailCanvas.width, trailCanvas.height);
+                    
+                    // Fill with black (0, 0, 0, 255)
+                    for (let i = 0; i < trailMap.data.length; i += 4) {
+                        trailMap.data[i] = 0;     // R
+                        trailMap.data[i + 1] = 0; // G
+                        trailMap.data[i + 2] = 0; // B
+                        trailMap.data[i + 3] = 255; // A (fully opaque)
+                    }
+                    
+                    // Draw initial trail map
+                    trailCtx.putImageData(trailMap, 0, 0);
+                    shouldInitTrailMap = false;
+                    return true;
+                } catch (e) {
+                    console.error("Failed to initialize trail map:", e);
+                    shouldInitTrailMap = true;
+                    return false;
                 }
-            });
-        });
-        
-        // Create background particles
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 20;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const size = Math.random() * 20 + 10;
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // Random positions
-                const posX = Math.random() * 100;
-                const posY = Math.random() * 100 + 100;
-                
-                // Random duration between 15 and 30 seconds
-                const duration = Math.random() * 15 + 15;
-                
-                // Set CSS properties
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${posX}%`;
-                particle.style.top = `${posY}%`;
-                particle.style.setProperty('--duration', `${duration}s`);
-                
-                // Add to container
-                particlesContainer.appendChild(particle);
             }
-        }
-        
-        // Initialize particles on page load
-        window.addEventListener('load', function() {
-            createParticles();
             
-            // Trigger reveal animations on initial elements in viewport
-            const reveals = document.querySelectorAll('.reveal');
-            reveals.forEach(reveal => {
-                const windowHeight = window.innerHeight;
-                const revealTop = reveal.getBoundingClientRect().top;
-                const revealPoint = 150;
-                
-                if (revealTop < windowHeight - revealPoint) {
-                    reveal.classList.add('active');
+            // Initialize agents according to pattern
+            function initializeAgents() {
+                if (trailCanvas.width <= 0 || trailCanvas.height <= 0) {
+                    return false;
                 }
+                
+                // Resize array buffers if needed
+                if (agentX.length !== config.agentCount) {
+                    agentX = new Float32Array(config.agentCount);
+                    agentY = new Float32Array(config.agentCount);
+                    agentAngle = new Float32Array(config.agentCount);
+                    agentSpecies = new Uint8Array(config.agentCount);
+                }
+                
+                agentCount = config.agentCount;
+                
+                const centerX = trailCanvas.width / 2;
+                const centerY = trailCanvas.height / 2;
+                
+                switch(config.initialPattern) {
+                    case 'circle':
+                        const radius = Math.min(trailCanvas.width, trailCanvas.height) * 0.3;
+                        for (let i = 0; i < agentCount; i++) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const r = radius * Math.sqrt(Math.random()); // Distribute evenly within circle
+                            agentX[i] = centerX + r * Math.cos(angle);
+                            agentY[i] = centerY + r * Math.sin(angle);
+                            // Angle points outward from center
+                            agentAngle[i] = Math.atan2(agentY[i] - centerY, agentX[i] - centerX);
+                            agentSpecies[i] = Math.floor(Math.random() * 5);
+                        }
+                        break;
+                    
+                    case 'center':
+                        for (let i = 0; i < agentCount; i++) {
+                            // All agents start at center with random directions
+                            agentX[i] = centerX;
+                            agentY[i] = centerY;
+                            agentAngle[i] = Math.random() * Math.PI * 2;
+                            agentSpecies[i] = Math.floor(Math.random() * 5);
+                        }
+                        break;
+                        
+                    case 'explosion':
+                        for (let i = 0; i < agentCount; i++) {
+                            // All agents start at center but point outward
+                            agentX[i] = centerX;
+                            agentY[i] = centerY;
+                            agentAngle[i] = Math.random() * Math.PI * 2;
+                            agentSpecies[i] = Math.floor(Math.random() * 5);
+                        }
+                        break;
+                        
+                    case 'random':
+                    default:
+                        for (let i = 0; i < agentCount; i++) {
+                            agentX[i] = Math.random() * trailCanvas.width;
+                            agentY[i] = Math.random() * trailCanvas.height;
+                            agentAngle[i] = Math.random() * Math.PI * 2;
+                            agentSpecies[i] = Math.floor(Math.random() * 5);
+                        }
+                        break;
+                }
+                
+                return true;
+            }
+            
+            // Get trail value at a specific position
+            function getTrailValue(x, y) {
+                // Convert to integer coordinates and check bounds
+                const ix = Math.floor(x);
+                const iy = Math.floor(y);
+                
+                if (ix < 0 || ix >= trailCanvas.width || iy < 0 || iy >= trailCanvas.height) {
+                    return 0;
+                }
+                
+                // Calculate index in the trail map data
+                const index = (iy * trailCanvas.width + ix) * 4;
+                
+                // Return the average of RGB values as intensity
+                return (
+                    trailMap.data[index] + 
+                    trailMap.data[index + 1] + 
+                    trailMap.data[index + 2]
+                ) / (3 * 255); // Normalize to 0-1
+            }
+            
+            // Set trail value at a specific position
+            function setTrailValue(x, y, intensity, angle) {
+                // Convert to integer coordinates and check bounds
+                const ix = Math.floor(x);
+                const iy = Math.floor(y);
+                
+                if (ix < 0 || ix >= trailCanvas.width || iy < 0 || iy >= trailCanvas.height) {
+                    return;
+                }
+                
+                // Calculate index in the trail map data
+                const index = (iy * trailCanvas.width + ix) * 4;
+                
+                // Get color based on current scheme
+                let color;
+                if (config.colorScheme === 'rainbow') {
+                    color = colorMaps[config.colorScheme](intensity, angle);
+                } else {
+                    color = colorMaps[config.colorScheme](intensity);
+                }
+                
+                // Set color (averaging with existing values to create blending)
+                trailMap.data[index] = Math.min(255, trailMap.data[index] + color[0] * config.trailStrength);
+                trailMap.data[index + 1] = Math.min(255, trailMap.data[index + 1] + color[1] * config.trailStrength);
+                trailMap.data[index + 2] = Math.min(255, trailMap.data[index + 2] + color[2] * config.trailStrength);
+                trailMap.data[index + 3] = 255; // Always fully opaque
+            }
+            
+            // Batch process for evaporating trails - process chunks for better performance
+            function evaporateTrails() {
+                const chunkSize = 200000; // Process in chunks
+                const evaporation = 255 * config.trailEvaporation;
+                const data = trailMap.data;
+                
+                for (let start = 0; start < data.length; start += chunkSize * 4) {
+                    const end = Math.min(start + chunkSize * 4, data.length);
+                    
+                    for (let i = start; i < end; i += 4) {
+                        data[i] = Math.max(0, data[i] - evaporation);
+                        data[i + 1] = Math.max(0, data[i + 1] - evaporation);
+                        data[i + 2] = Math.max(0, data[i + 2] - evaporation);
+                    }
+                }
+            }
+            
+            // Update agent positions and trail map
+            function updateSimulation() {
+                // Make sure trail map is initialized
+                if (shouldInitTrailMap && !initializeTrailMap()) {
+                    // Canvas not ready yet, try again on next frame
+                    requestAnimationFrame(animate);
+                    return;
+                }
+                
+                // Clear agent canvas
+                agentCtx.clearRect(0, 0, agentCanvas.width, agentCanvas.height);
+                
+                // Only process a subset of agents per frame for better performance
+                const agentsPerFrame = Math.min(agentCount, 10000); // Cap at 10,000 agents per frame
+                const skipRate = Math.max(1, Math.floor(agentCount / agentsPerFrame));
+                
+                // Draw agents
+                for (let i = 0; i < agentCount; i += skipRate) {
+                    // Agent sensing
+                    const leftSensorAngle = agentAngle[i] - config.sensorAngle;
+                    const rightSensorAngle = agentAngle[i] + config.sensorAngle;
+                    
+                    const sensorOffsetX = config.sensorDistance * config.agentSize;
+                    const sensorOffsetY = config.sensorDistance * config.agentSize;
+                    
+                    const leftSensorX = agentX[i] + Math.cos(leftSensorAngle) * sensorOffsetX;
+                    const leftSensorY = agentY[i] + Math.sin(leftSensorAngle) * sensorOffsetY;
+                    
+                    const centerSensorX = agentX[i] + Math.cos(agentAngle[i]) * sensorOffsetX;
+                    const centerSensorY = agentY[i] + Math.sin(agentAngle[i]) * sensorOffsetY;
+                    
+                    const rightSensorX = agentX[i] + Math.cos(rightSensorAngle) * sensorOffsetX;
+                    const rightSensorY = agentY[i] + Math.sin(rightSensorAngle) * sensorOffsetY;
+                    
+                    // Sample pheromone trail at each sensor position
+                    const leftTrail = getTrailValue(leftSensorX, leftSensorY);
+                    const centerTrail = getTrailValue(centerSensorX, centerSensorY);
+                    const rightTrail = getTrailValue(rightSensorX, rightSensorY);
+                    
+                    // Determine steering direction based on pheromone concentrations
+                    if (centerTrail > leftTrail && centerTrail > rightTrail) {
+                        // Continue straight (slight random adjustment)
+                        agentAngle[i] += (Math.random() - 0.5) * config.randomTurn * 0.5;
+                    } else if (leftTrail > rightTrail) {
+                        // Turn left
+                        agentAngle[i] -= config.turnSpeed * 0.05;
+                    } else if (rightTrail > leftTrail) {
+                        // Turn right
+                        agentAngle[i] += config.turnSpeed * 0.05;
+                    } else {
+                        // Random direction change if no trail detected or equal trail
+                        agentAngle[i] += (Math.random() - 0.5) * config.randomTurn;
+                    }
+                    
+                    // Add random steering with species factor (some species wander more than others)
+                    agentAngle[i] += (Math.random() - 0.5) * config.randomTurn * (1 + agentSpecies[i] * 0.1);
+                    
+                    // Move agent forward
+                    agentX[i] += Math.cos(agentAngle[i]) * config.moveSpeed;
+                    agentY[i] += Math.sin(agentAngle[i]) * config.moveSpeed;
+                    
+                    // Deposit pheromone trail
+                    setTrailValue(agentX[i], agentY[i], 1.0, agentAngle[i]);
+                    
+                    // Wrap around edges
+                    if (agentX[i] < 0) agentX[i] = trailCanvas.width - 1;
+                    if (agentX[i] >= trailCanvas.width) agentX[i] = 0;
+                    if (agentY[i] < 0) agentY[i] = trailCanvas.height - 1;
+                    if (agentY[i] >= trailCanvas.height) agentY[i] = 0;
+                }
+                
+                // Draw all agents (batch rendering)
+                agentCtx.beginPath();
+                
+                for (let i = 0; i < agentCount; i++) {
+                    // Set color based on scheme
+                    if (config.colorScheme === 'rainbow') {
+                        const hue = ((agentAngle[i] / (Math.PI * 2)) * 360) % 360;
+                        agentCtx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+                    } else {
+                        // Using the same color as the trail but at full intensity
+                        const color = colorMaps[config.colorScheme](1.0);
+                        agentCtx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
+                    }
+                    
+                    agentCtx.beginPath();
+                    agentCtx.arc(agentX[i], agentY[i], config.agentSize, 0, Math.PI * 2);
+                    agentCtx.fill();
+                }
+                
+                // Evaporate trails by reducing color intensity
+                evaporateTrails();
+                
+                // Update trail canvas
+                trailCtx.putImageData(trailMap, 0, 0);
+            }
+            
+            // FPS tracking
+            let frameCount = 0;
+            let lastTime = performance.now();
+            let fps = 0;
+            
+            // Animation loop
+            function animate(timestamp) {
+                // Update FPS counter
+                frameCount++;
+                if (timestamp - lastTime >= 1000) {
+                    fps = Math.round(frameCount * 1000 / (timestamp - lastTime));
+                    frameCount = 0;
+                    lastTime = timestamp;
+                    
+                    // Update display
+                    document.getElementById('fpsCounter').textContent = `FPS: ${fps} | Agents: ${agentCount}`;
+                }
+                
+                // Update simulation
+                updateSimulation();
+                
+                // Request next frame
+                requestAnimationFrame(animate);
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                updateCanvasSize();
+                shouldInitTrailMap = true;
             });
+            
+            // UI Controls
+            document.getElementById('agentCount').addEventListener('input', (e) => {
+                config.agentCount = parseInt(e.target.value);
+                document.getElementById('agentCountValue').textContent = config.agentCount;
+                initializeAgents();
+            });
+            
+            document.getElementById('agentSize').addEventListener('input', (e) => {
+                config.agentSize = parseFloat(e.target.value);
+                document.getElementById('agentSizeValue').textContent = config.agentSize.toFixed(1);
+            });
+            
+            document.getElementById('sensorAngle').addEventListener('input', (e) => {
+                const degrees = parseInt(e.target.value);
+                config.sensorAngle = degrees * (Math.PI / 180); // Convert to radians
+                document.getElementById('sensorAngleValue').textContent = degrees;
+            });
+            
+            document.getElementById('sensorDistance').addEventListener('input', (e) => {
+                config.sensorDistance = parseInt(e.target.value);
+                document.getElementById('sensorDistanceValue').textContent = config.sensorDistance;
+            });
+            
+            document.getElementById('trailStrength').addEventListener('input', (e) => {
+                config.trailStrength = parseFloat(e.target.value);
+                document.getElementById('trailStrengthValue').textContent = config.trailStrength.toFixed(2);
+            });
+            
+            document.getElementById('trailEvaporation').addEventListener('input', (e) => {
+                config.trailEvaporation = parseFloat(e.target.value);
+                document.getElementById('trailEvaporationValue').textContent = config.trailEvaporation.toFixed(3);
+            });
+            
+            document.getElementById('turnSpeed').addEventListener('input', (e) => {
+                config.turnSpeed = parseFloat(e.target.value);
+                document.getElementById('turnSpeedValue').textContent = config.turnSpeed.toFixed(1);
+            });
+            
+            document.getElementById('moveSpeed').addEventListener('input', (e) => {
+                config.moveSpeed = parseFloat(e.target.value);
+                document.getElementById('moveSpeedValue').textContent = config.moveSpeed.toFixed(1);
+            });
+            
+            document.getElementById('randomTurn').addEventListener('input', (e) => {
+                config.randomTurn = parseFloat(e.target.value);
+                document.getElementById('randomTurnValue').textContent = config.randomTurn.toFixed(2);
+            });
+            
+            document.getElementById('colorScheme').addEventListener('change', (e) => {
+                config.colorScheme = e.target.value;
+            });
+            
+            document.getElementById('initialPattern').addEventListener('change', (e) => {
+                config.initialPattern = e.target.value;
+            });
+            
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                // Reset simulation
+                shouldInitTrailMap = true;
+                initializeAgents();
+            });
+            
+            // Toggle controls visibility
+            document.getElementById('toggleControls').addEventListener('click', () => {
+                const controls = document.getElementById('controls');
+                const toggleBtn = document.getElementById('toggleControls');
+                
+                // Get all elements except the toggle button
+                const elements = controls.querySelectorAll(':not(#toggleControls)');
+                
+                // Toggle visibility
+                let isVisible = elements[0].style.display !== 'none';
+                
+                elements.forEach(el => {
+                    el.style.display = isVisible ? 'none' : '';
+                });
+                
+                toggleBtn.textContent = isVisible ? 'Show Controls' : 'Hide Controls';
+            });
+            
+            // Start simulation with a small delay to ensure canvas is ready
+            setTimeout(() => {
+                initializeTrailMap();
+                initializeAgents();
+                requestAnimationFrame(animate);
+            }, 100);
         });
     </script>
 </body>
