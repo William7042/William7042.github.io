@@ -12,17 +12,49 @@
             background-color: #111;
             color: #f0f0f0;
             line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(76, 175, 80, 0.3);
+            border-radius: 50%;
         }
         
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 40px 20px;
+            position: relative;
+            z-index: 1;
         }
         
         header {
             text-align: center;
             margin-bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4CAF50;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
         }
         
         h1 {
@@ -38,32 +70,42 @@
             font-style: italic;
         }
         
-        .projects-list {
-            list-style-type: none;
-            padding: 0;
+        /* Slideshow container */
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow: hidden;
+            min-height: 300px;
         }
         
-        .project-item {
-            background-color: #222;
+        /* Project slides */
+        .project-slide {
+            background-color: rgba(34, 34, 34, 0.9);
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 30px;
             border-left: 4px solid #4CAF50;
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            box-sizing: border-box;
+            transform: translateX(100%);
+            transition: transform 0.5s ease, opacity 0.5s ease;
         }
         
-        .project-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        .project-slide.active {
+            opacity: 1;
+            transform: translateX(0);
         }
         
-        .project-item h2 {
+        .project-slide h2 {
             margin-top: 0;
             color: #4CAF50;
         }
         
-        .project-item p {
-            margin-bottom: 15px;
+        .project-slide p {
+            margin-bottom: 20px;
             color: #ddd;
         }
         
@@ -71,7 +113,7 @@
             display: inline-block;
             background-color: #4CAF50;
             color: white;
-            padding: 8px 16px;
+            padding: 10px 20px;
             text-decoration: none;
             border-radius: 4px;
             font-weight: bold;
@@ -80,11 +122,6 @@
         
         .project-link:hover {
             background-color: #45a049;
-        }
-        
-        .coming-soon {
-            opacity: 0.6;
-            cursor: default;
         }
         
         .coming-soon .project-link {
@@ -96,6 +133,56 @@
             background-color: #555;
         }
         
+        /* Navigation buttons */
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px 15px;
+            color: white;
+            background-color: rgba(76, 175, 80, 0.6);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            transition: background-color 0.3s ease;
+        }
+        
+        .prev:hover, .next:hover {
+            background-color: rgba(76, 175, 80, 0.9);
+        }
+        
+        .prev {
+            left: -5px;
+        }
+        
+        .next {
+            right: -5px;
+        }
+        
+        /* Slide indicators */
+        .dots-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin: 0 5px;
+            background-color: #555;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .dot.active {
+            background-color: #4CAF50;
+        }
+        
         footer {
             text-align: center;
             margin-top: 50px;
@@ -105,41 +192,183 @@
     </style>
 </head>
 <body>
+    <!-- Animated background particles -->
+    <div class="particles" id="particles"></div>
+    
     <div class="container">
         <header>
+            <!-- Profile picture - replace the src with your own image path -->
+            <img src="your-image.jpg" alt="William7042" class="profile-pic">
             <h1>William7042</h1>
             <div class="subtitle">projects portfolio</div>
         </header>
         
-        <ul class="projects-list">
-            <li class="project-item">
+        <!-- Slideshow container -->
+        <div class="slideshow-container">
+            <!-- Project slides -->
+            <div class="project-slide active">
                 <h2>Slime Mold Simulation</h2>
                 <p>Very cool slime mold that makes very cool patterns and designs. I recommend using circle or explosion initial patterns, and turning down the agent size and trail evaporation. Use reset simulation button after choosing pattern.</p>
                 <a href="slimemold.html" class="project-link">Launch Simulation</a>
-            </li>
+            </div>
             
-            <li class="project-item coming-soon">
+            <div class="project-slide coming-soon">
                 <h2>Project 2</h2>
                 <p>Coming Soon</p>
                 <a href="#" class="project-link">Coming Soon</a>
-            </li>
+            </div>
             
-            <li class="project-item coming-soon">
+            <div class="project-slide coming-soon">
                 <h2>Project 3</h2>
                 <p>Coming Soon</p>
                 <a href="#" class="project-link">Coming Soon</a>
-            </li>
+            </div>
             
-            <li class="project-item coming-soon">
+            <div class="project-slide coming-soon">
                 <h2>Project 4</h2>
                 <p>Coming Soon</p>
                 <a href="#" class="project-link">Coming Soon</a>
-            </li>
-        </ul>
+            </div>
+            
+            <!-- Navigation buttons -->
+            <button class="prev">❮</button>
+            <button class="next">❯</button>
+        </div>
+        
+        <!-- Slide indicators -->
+        <div class="dots-container">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
+            <span class="dot" data-index="3"></span>
+        </div>
         
         <footer>
-            © 2025 William7042 | <a href="https://github.com/william7042" style="color: #4CAF50; text-decoration: none;">GitHub</a>
+            © 2025 William7042
         </footer>
     </div>
+
+    <script>
+        // Create background particles
+        document.addEventListener('DOMContentLoaded', function() {
+            // Particles animation
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 3px and 8px
+                const size = Math.random() * 5 + 3;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                // Random position
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                
+                // Random opacity
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                particlesContainer.appendChild(particle);
+                
+                // Animate each particle
+                animateParticle(particle);
+            }
+            
+            // Slideshow functionality
+            const slides = document.querySelectorAll('.project-slide');
+            const dots = document.querySelectorAll('.dot');
+            const prevBtn = document.querySelector('.prev');
+            const nextBtn = document.querySelector('.next');
+            let currentSlide = 0;
+            
+            // Initialize positions
+            slides.forEach((slide, index) => {
+                if (index !== 0) {
+                    slide.style.transform = 'translateX(100%)';
+                    slide.style.opacity = '0';
+                    slide.classList.remove('active');
+                }
+            });
+            
+            // Show slide function
+            function showSlide(n) {
+                // Hide current slide
+                slides[currentSlide].style.transform = 'translateX(-100%)';
+                slides[currentSlide].style.opacity = '0';
+                slides[currentSlide].classList.remove('active');
+                dots[currentSlide].classList.remove('active');
+                
+                // Update current slide
+                currentSlide = (n + slides.length) % slides.length;
+                
+                // Show new current slide
+                slides[currentSlide].style.transform = 'translateX(0)';
+                slides[currentSlide].style.opacity = '1';
+                slides[currentSlide].classList.add('active');
+                dots[currentSlide].classList.add('active');
+            }
+            
+            // Next slide
+            function nextSlide() {
+                showSlide(currentSlide + 1);
+            }
+            
+            // Previous slide
+            function prevSlide() {
+                showSlide(currentSlide - 1);
+            }
+            
+            // Event listeners
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            
+            // Dot navigation
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const slideIndex = parseInt(dot.getAttribute('data-index'));
+                    showSlide(slideIndex);
+                });
+            });
+        });
+        
+        function animateParticle(particle) {
+            // Starting position
+            let x = parseFloat(particle.style.left);
+            let y = parseFloat(particle.style.top);
+            
+            // Random movement direction
+            let dx = (Math.random() - 0.5) * 0.1;
+            let dy = (Math.random() - 0.5) * 0.1;
+            
+            function move() {
+                // Update position
+                x += dx;
+                y += dy;
+                
+                // Wrap around screen edges
+                if (x < 0) x = 100;
+                if (x > 100) x = 0;
+                if (y < 0) y = 100;
+                if (y > 100) y = 0;
+                
+                // Apply new position
+                particle.style.left = x + '%';
+                particle.style.top = y + '%';
+                
+                // Randomly change direction occasionally
+                if (Math.random() < 0.01) {
+                    dx = (Math.random() - 0.5) * 0.1;
+                    dy = (Math.random() - 0.5) * 0.1;
+                }
+                
+                requestAnimationFrame(move);
+            }
+            
+            move();
+        }
+    </script>
 </body>
 </html>
