@@ -3,167 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slime Mold Simulation Menu</title>
+    <title>William7042's Projects</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(135deg, #000000 0%, #1a1a2e 100%);
+            font-family: 'Courier New', monospace;
+            background-color: #111;
+            color: #f0f0f0;
+            line-height: 1.6;
         }
         
         .container {
-            text-align: center;
             max-width: 800px;
-            padding: 20px;
-            box-sizing: border-box;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
         }
         
         h1 {
             font-size: 3rem;
-            margin-bottom: 10px;
             color: #4CAF50;
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
         }
         
-        p {
+        .subtitle {
             font-size: 1.2rem;
-            margin-bottom: 30px;
-            color: #ccc;
-            line-height: 1.6;
+            color: #aaa;
+            font-style: italic;
         }
         
-        .btn {
+        .projects-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .project-item {
+            background-color: #222;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .project-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .project-item h2 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        
+        .project-item p {
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+        
+        .project-link {
             display: inline-block;
-            padding: 20px 50px;
             background-color: #4CAF50;
             color: white;
+            padding: 8px 16px;
             text-decoration: none;
-            border-radius: 8px;
-            font-size: 1.5rem;
+            border-radius: 4px;
             font-weight: bold;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            margin: 30px 0;
+            transition: background-color 0.3s ease;
         }
         
-        .btn:hover {
+        .project-link:hover {
             background-color: #45a049;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
         
-        .footer {
-            position: absolute;
-            bottom: 20px;
-            font-size: 0.9rem;
+        .coming-soon {
+            opacity: 0.6;
+            cursor: default;
+        }
+        
+        .coming-soon .project-link {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        
+        .coming-soon .project-link:hover {
+            background-color: #555;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
             color: #666;
-        }
-        
-        /* Animation for background particles */
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        
-        .particle {
-            position: absolute;
-            background-color: rgba(76, 175, 80, 0.3);
-            border-radius: 50%;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
-    
     <div class="container">
-        <h1>Slime Mold Simulation</h1>
-        <p>very cool slime mold makes very cool patterns and designs</p>
+        <header>
+            <h1>William7042</h1>
+            <div class="subtitle">projects portfolio</div>
+        </header>
         
-        <a href="simulation.html" class="btn">Launch Slime Mold Simulation</a>
+        <ul class="projects-list">
+            <li class="project-item">
+                <h2>Slime Mold Simulation</h2>
+                <p>Very cool slime mold that makes very cool patterns and designs. I recommend using circle or explosion initial patterns, and turning down the agent size and trail evaporation. Use reset simulation button after choosing pattern.</p>
+                <a href="slimemold.html" class="project-link">Launch Simulation</a>
+            </li>
+            
+            <li class="project-item coming-soon">
+                <h2>Project 2</h2>
+                <p>Coming Soon</p>
+                <a href="#" class="project-link">Coming Soon</a>
+            </li>
+            
+            <li class="project-item coming-soon">
+                <h2>Project 3</h2>
+                <p>Coming Soon</p>
+                <a href="#" class="project-link">Coming Soon</a>
+            </li>
+            
+            <li class="project-item coming-soon">
+                <h2>Project 4</h2>
+                <p>Coming Soon</p>
+                <a href="#" class="project-link">Coming Soon</a>
+            </li>
+        </ul>
         
-        <p>for the parameters I recommend using circle or explosion initial patterns, and turning down the agent size all the way and maybe turning down the trail evaporation a little bit</p>
+        <footer>
+            © 2025 William7042 | <a href="https://github.com/william7042" style="color: #4CAF50; text-decoration: none;">GitHub</a>
+        </footer>
     </div>
-
-
-    <script>
-        // Create background particles
-        document.addEventListener('DOMContentLoaded', function() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 50;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // Random size between 3px and 8px
-                const size = Math.random() * 5 + 3;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                
-                // Random position
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                
-                // Random opacity
-                particle.style.opacity = Math.random() * 0.5 + 0.1;
-                
-                particlesContainer.appendChild(particle);
-                
-                // Animate each particle
-                animateParticle(particle);
-            }
-        });
-        
-        function animateParticle(particle) {
-            // Starting position
-            let x = parseFloat(particle.style.left);
-            let y = parseFloat(particle.style.top);
-            
-            // Random movement direction
-            let dx = (Math.random() - 0.5) * 0.1;
-            let dy = (Math.random() - 0.5) * 0.1;
-            
-            function move() {
-                // Update position
-                x += dx;
-                y += dy;
-                
-                // Wrap around screen edges
-                if (x < 0) x = 100;
-                if (x > 100) x = 0;
-                if (y < 0) y = 100;
-                if (y > 100) y = 0;
-                
-                // Apply new position
-                particle.style.left = x + '%';
-                particle.style.top = y + '%';
-                
-                // Randomly change direction occasionally
-                if (Math.random() < 0.01) {
-                    dx = (Math.random() - 0.5) * 0.1;
-                    dy = (Math.random() - 0.5) * 0.1;
-                }
-                
-                requestAnimationFrame(move);
-            }
-            
-            move();
-        }
-    </script>
 </body>
 </html>
