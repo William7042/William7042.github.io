@@ -474,36 +474,49 @@
                         break;
                         
                     case 'corners':
+                        const agentsPerCorner = Math.ceil(agentCount / 4);
+                        
                         for (let i = 0; i < agentCount; i++) {
-                            // Randomly select which corner to place the agent in
-                            const corner = Math.floor(Math.random() * 4);
+                            // Determine which corner this agent belongs to
+                            const corner = Math.floor(i / agentsPerCorner);
+                            
+                            // Fan angle to create spread (from 0 to π/2 radians)
+                            const fanProgress = (i % agentsPerCorner) / agentsPerCorner;
+                            const fanAngle = fanProgress * (Math.PI / 2);
                             
                             switch(corner) {
                                 case 0: // Top-left
-                                    agentX[i] = Math.random() * (trailCanvas.width * 0.2);
-                                    agentY[i] = Math.random() * (trailCanvas.height * 0.2);
-                                    // Point outward (southeast direction with some randomness)
-                                    agentAngle[i] = Math.PI / 4 + (Math.random() - 0.5) * 0.5;
+                                    agentX[i] = 0;
+                                    agentY[i] = 0;
+                                    // Fan from south to east (π/2 to 0)
+                                    agentAngle[i] = Math.PI / 2 - fanAngle;
                                     break;
                                 case 1: // Top-right
-                                    agentX[i] = trailCanvas.width - Math.random() * (trailCanvas.width * 0.2);
-                                    agentY[i] = Math.random() * (trailCanvas.height * 0.2);
-                                    // Point outward (southwest direction with some randomness)
-                                    agentAngle[i] = Math.PI * 3/4 + (Math.random() - 0.5) * 0.5;
+                                    agentX[i] = trailCanvas.width;
+                                    agentY[i] = 0;
+                                    // Fan from south to west (π/2 to π)
+                                    agentAngle[i] = Math.PI / 2 + fanAngle;
                                     break;
                                 case 2: // Bottom-left
-                                    agentX[i] = Math.random() * (trailCanvas.width * 0.2);
-                                    agentY[i] = trailCanvas.height - Math.random() * (trailCanvas.height * 0.2);
-                                    // Point outward (northeast direction with some randomness)
-                                    agentAngle[i] = Math.PI * 7/4 + (Math.random() - 0.5) * 0.5;
+                                    agentX[i] = 0;
+                                    agentY[i] = trailCanvas.height;
+                                    // Fan from north to east (3π/2 to 2π)
+                                    agentAngle[i] = (Math.PI * 3) / 2 - fanAngle;
                                     break;
-                                case 3: // Bottom-right
-                                    agentX[i] = trailCanvas.width - Math.random() * (trailCanvas.width * 0.2);
-                                    agentY[i] = trailCanvas.height - Math.random() * (trailCanvas.height * 0.2);
-                                    // Point outward (northwest direction with some randomness)
-                                    agentAngle[i] = Math.PI * 5/4 + (Math.random() - 0.5) * 0.5;
+                                case 3: // Bottom-right (or any remaining agents)
+                                    agentX[i] = trailCanvas.width;
+                                    agentY[i] = trailCanvas.height;
+                                    // Fan from north to west (3π/2 to π)
+                                    agentAngle[i] = (Math.PI * 3) / 2 + fanAngle;
                                     break;
                             }
+                            
+                            // Add a tiny bit of position randomness to prevent all agents starting at exact same pixel
+                            agentX[i] += (Math.random() - 0.5) * 2;
+                            agentY[i] += (Math.random() - 0.5) * 2;
+                            
+                            // Add a tiny angle randomness for more natural look
+                            agentAngle[i] += (Math.random() - 0.5) * 0.1;
                             
                             agentSpecies[i] = Math.floor(Math.random() * 5);
                         }
