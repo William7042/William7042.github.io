@@ -22,7 +22,6 @@
   --dark-color: #1a0a1a;
 }
 
-/* Click Overlay Styles */
 .click-overlay {
   position: fixed;
   top: 0;
@@ -54,7 +53,6 @@
   50% { transform: scale(1.1); opacity: 1; }
 }
 
-/* SIMPLE hearts that just appear and STAY - no disappearing animations! */
 .heart {
   position: absolute;
   width: 20px;
@@ -64,7 +62,6 @@
   pointer-events: none;
   z-index: 5000;
   opacity: 0.9;
-  /* NO animations that make them disappear! */
 }
 
 .heart::before,
@@ -87,7 +84,6 @@
   left: 0;
 }
 
-/* Simple pop-in animation that KEEPS them visible */
 .heart.growing {
   animation: heartPopStay 0.2s ease-out forwards;
 }
@@ -98,11 +94,10 @@
   }
   100% {
     transform: rotate(45deg) scale(var(--scale));
-    opacity: 0.9; /* STAY visible! */
+    opacity: 0.9; 
   }
 }
 
-/* Only explosion animation at the end */
 .heart-explosion {
   animation: explodeHeart 1s ease-out forwards !important;
 }
@@ -132,7 +127,6 @@
   }
 }
 
-/* Hide main content initially - fix random petals issue */
 .main-content {
   opacity: 0;
   visibility: hidden;
@@ -229,7 +223,6 @@ body::before {
     linear-gradient(90deg, rgb(255, 182, 193), rgb(255, 215, 0));
 }
 
-/* Photo Gallery Styles */
 .photo-gallery {
   position: absolute;
   top: 10%;
@@ -311,7 +304,6 @@ body::before {
   }
 }
 
-/* Proposal Text Styles */
 .proposal-container {
   position: absolute;
   top: 50%;
@@ -419,7 +411,6 @@ body::before {
   }
 }
 
-/* Flower Container Modifications */
 .flowers-left,
 .flowers-right {
   position: absolute;
@@ -1655,7 +1646,6 @@ body::before {
   animation-play-state: paused !important;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .click-text {
     font-size: 2rem;
@@ -1705,11 +1695,11 @@ body::before {
     
 
     <div class="photo-gallery">
-      <img src="https://drive.google.com/file/d/1AMafKu44e6MYtgZQ_lIOi2y5d9GXpf7b/view?usp=sharing" class="photo">
-      <img src="https://raw.githubusercontent.com/yourusername/yourrepo/main/photos/photo2.jpg" class="photo">
-      <img src="https://raw.githubusercontent.com/yourusername/yourrepo/main/photos/photo3.jpg" class="photo">
-      <img src="https://raw.githubusercontent.com/yourusername/yourrepo/main/photos/photo4.jpg" class="photo">
-      <img src="https://raw.githubusercontent.com/yourusername/yourrepo/main/photos/photo5.jpg" class="photo">
+      <img src="1343551742469244_.pic.jpg" class="photo">
+      <img src="1400181743589501_.pic.jpg" class="photo">
+      <img src="1400181743589501_.pic.jpg" class="photo">
+      <img src="66531747744532_.pic.jpg" class="photo">
+      <img src="66541747744534_.pic.jpg" class="photo">
     </div>
     
     <!-- Proposal Text -->
