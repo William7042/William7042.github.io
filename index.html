@@ -1,6 +1,1096 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="refresh" content="0; url='promposal.html'" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>william m. — field notes on living systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --ink:      #dce9e6;
+        --dim:      #61726f;
+        --accent:   #a5f3dd;
+        --hairline: rgba(220, 233, 230, 0.14);
+        --card-bg:  rgba(4, 8, 12, 0.62);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: auto; }
+    body {
+        background: #04070b;
+        color: var(--ink);
+        font-family: 'IBM Plex Mono', monospace;
+        overflow-x: hidden;
+    }
+    ::selection { background: rgba(165, 243, 221, 0.25); }
+
+    /* Sim canvas lives behind everything and never eats input */
+    #container {
+        position: fixed; inset: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* ── fixed chrome ─────────────────────────────────────────── */
+    #chrome { position: fixed; inset: 0; pointer-events: none; z-index: 2; }
+    #header {
+        position: absolute; top: 28px; left: 32px;
+        pointer-events: auto;
+    }
+    #header .name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600; font-size: 15px; letter-spacing: 0.02em;
+    }
+    #header .role {
+        margin-top: 3px;
+        font-size: 10px; letter-spacing: 0.14em;
+        color: var(--dim); text-transform: uppercase;
+    }
+    #rail {
+        position: absolute; right: 26px; top: 50%;
+        transform: translateY(-50%);
+        display: flex; flex-direction: column; gap: 14px;
+        font-size: 9px; letter-spacing: 0.1em; color: var(--dim);
+        text-align: right;
+    }
+    #rail .tick { display: flex; align-items: center; gap: 8px; justify-content: flex-end; transition: color 0.3s; }
+    #rail .tick .dash { display: inline-block; width: 10px; height: 1px; background: var(--dim); transition: width 0.3s, background 0.3s; }
+    #rail .tick.active { color: var(--accent); }
+    #rail .tick.active .dash { width: 22px; background: var(--accent); }
+
+    /* ── scroll content ───────────────────────────────────────── */
+    #content { position: relative; z-index: 1; }
+    section {
+        position: relative;
+        min-height: 100vh;
+        display: flex; align-items: center;
+        padding: 0 8vw;
+    }
+    section .card { will-change: opacity, transform; }
+
+    /* hero */
+    #hero { justify-content: center; text-align: center; }
+    #hero .eyebrow {
+        font-size: 10px; letter-spacing: 0.28em; color: var(--dim);
+        text-transform: uppercase; margin-bottom: 22px;
+    }
+    #hero h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: clamp(44px, 8vw, 92px);
+        letter-spacing: -0.02em; line-height: 1;
+    }
+    #hero .sub {
+        margin-top: 20px; font-size: 12px; color: var(--dim);
+        letter-spacing: 0.06em;
+    }
+    #hero .scrollcue {
+        position: absolute; bottom: 40px; left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px; letter-spacing: 0.22em; color: var(--dim);
+        text-transform: uppercase;
+        animation: cue 2.4s ease-in-out infinite;
+    }
+    @keyframes cue { 0%,100% { opacity: 0.35; } 50% { opacity: 0.9; } }
+    @media (prefers-reduced-motion: reduce) {
+        #hero .scrollcue { animation: none; }
+    }
+
+    /* project cards */
+    .project.right { justify-content: flex-end; }
+    .card {
+        position: relative;
+        max-width: 440px;
+        padding: 30px 32px 28px;
+        background: var(--card-bg);
+        border: 1px solid var(--hairline);
+        backdrop-filter: blur(7px);
+        -webkit-backdrop-filter: blur(7px);
+    }
+    .card::before, .card::after {
+        content: ''; position: absolute; width: 15px; height: 15px;
+    }
+    .card::before { top: -1px; left: -1px; border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
+    .card::after  { bottom: -1px; right: -1px; border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); }
+    .card.bare { background: none; border: none; backdrop-filter: none; -webkit-backdrop-filter: none; max-width: none; }
+    .card.bare::before, .card.bare::after { display: none; }
+    .card .eyebrow {
+        display: flex; justify-content: space-between; gap: 12px;
+        font-size: 9px; letter-spacing: 0.2em; color: var(--dim);
+        text-transform: uppercase; margin-bottom: 16px;
+    }
+    .card .coords { color: var(--dim); opacity: 0.8; letter-spacing: 0.1em; }
+    .card h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 500; font-size: 26px; letter-spacing: -0.01em;
+        margin-bottom: 12px;
+    }
+    .card p { font-size: 12px; line-height: 1.75; color: #b9c7c4; }
+    .card .tags {
+        margin-top: 16px; display: flex; flex-wrap: wrap; gap: 7px;
+    }
+    .card .tags span {
+        font-size: 9px; letter-spacing: 0.12em; color: var(--dim);
+        border: 1px solid var(--hairline); padding: 3px 8px;
+        text-transform: uppercase;
+    }
+    .card a.visit {
+        display: inline-block; margin-top: 20px;
+        font-size: 11px; letter-spacing: 0.1em;
+        color: var(--accent); text-decoration: none;
+        border-bottom: 1px solid rgba(165,243,221,0.35);
+        padding-bottom: 2px;
+        transition: border-color 0.2s;
+    }
+    .card a.visit:hover { border-color: var(--accent); }
+
+    /* contact */
+    #contact { justify-content: center; text-align: center; }
+    #contact h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 500; font-size: clamp(26px, 4vw, 44px);
+        letter-spacing: -0.01em; margin-bottom: 26px;
+    }
+    #contact .links { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; }
+    #contact .links a {
+        font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--ink); text-decoration: none;
+        border-bottom: 1px solid var(--hairline); padding-bottom: 3px;
+        transition: color 0.2s, border-color 0.2s;
+    }
+    #contact .links a:hover { color: var(--accent); border-color: var(--accent); }
+    #contact .fineprint { margin-top: 40px; font-size: 9px; letter-spacing: 0.16em; color: var(--dim); text-transform: uppercase; }
+
+    @media (max-width: 768px) {
+        #rail { display: none; }
+        section { padding: 0 6vw; }
+        .project.right { justify-content: flex-start; }
+        .card { max-width: 100%; }
+    }
+</style>
 </head>
+<body>
+<div id="container"></div>
+
+<div id="chrome">
+    <div id="header">
+        <div class="name">william m.</div>
+        <div class="role">software · simulation · systems</div>
+    </div>
+    <div id="rail"></div>
+</div>
+
+<div id="content">
+    <section id="hero">
+        <div class="card bare">
+            <div class="eyebrow">field notes / living systems</div>
+            <h1>william m.</h1>
+            <div class="sub">seven projects, connected by a slime mold that is solving them right now</div>
+        </div>
+        <div class="scrollcue">scroll to descend · 07 specimens</div>
+    </section>
+    <!-- project sections generated from PROJECTS below -->
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════════════════
+   EDIT YOUR CONTENT HERE
+   Everything below renders from this array. Replace the placeholders.
+   The mold treats each project as a food source and grows a network
+   between them — order determines the flight path top to bottom.
+   ═══════════════════════════════════════════════════════════════════ */
+const PROJECTS = [
+    { title: 'Project One',   desc: 'One or two sentences on what it is, why it exists, and the part you are proud of. Placeholder copy — replace me.', tags: ['webgl', 'simulation'],      link: '#' },
+    { title: 'Project Two',   desc: 'Placeholder. Concrete beats clever: what it does, who used it, one number if you have one.',                        tags: ['typescript', 'tooling'],    link: '#' },
+    { title: 'Project Three', desc: 'Placeholder description for the third specimen in the collection.',                                                 tags: ['systems'],                  link: '#' },
+    { title: 'Project Four',  desc: 'Placeholder description for the fourth specimen in the collection.',                                                tags: ['data', 'viz'],              link: '#' },
+    { title: 'Project Five',  desc: 'Placeholder description for the fifth specimen in the collection.',                                                 tags: ['audio'],                    link: '#' },
+    { title: 'Project Six',   desc: 'Placeholder description for the sixth specimen in the collection.',                                                 tags: ['ml'],                       link: '#' },
+    { title: 'Project Seven', desc: 'Placeholder description for the seventh specimen in the collection.',                                               tags: ['hardware', 'firmware'],     link: '#' },
+];
+const CONTACT = {
+    heading: 'want to grow something together?',
+    links: [
+        { label: 'email',  href: 'mailto:you@example.com' },
+        { label: 'github', href: 'https://github.com/yourhandle' },
+        { label: 'resume', href: '#' },
+    ],
+};
+
+// ─── Sim config ──────────────────────────────────────────────────────────────
+const isMobile = matchMedia('(max-width: 768px)').matches || matchMedia('(pointer: coarse)').matches;
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const config = {
+    agentCount:  isMobile ? 6000 : 40000,
+    sensorAngle: 35 * Math.PI / 180,
+    sensorDist:  15,
+    turnSpeed:   0.12,
+    moveSpeed:   0.25,
+    decay:       0.99,
+    trailSize:   0.7,
+    worldSize:   300,
+    randomness:  0.15,
+    bloom:       0.19,
+};
+
+const GRID  = 64, COLS = 8, ATLAS = GRID * COLS;
+const HISTORY = 64, HCOLS = 8, HROWS = 8, RECORD_EVERY = 1;
+const WARMUP_FRAMES = 300; // sim runs 4× speed at first so the network forms fast
+
+function agentTexSize(n) { return Math.ceil(Math.sqrt(n)); }
+
+// ─── Project nodes: a loose descending helix the camera flies along ─────────
+const NODES = PROJECTS.map((p, i) => {
+    const a = i * 2.15 + 0.7;
+    const r = 85;
+    const y = 95 - i * (190 / Math.max(PROJECTS.length - 1, 1));
+    return new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r);
+});
+
+// Camera poses: hero overview → one pose per node → contact pull-back
+const POSES = (() => {
+    const poses = [{ pos: new THREE.Vector3(0, 55, 330), look: new THREE.Vector3(0, 0, 0) }];
+    NODES.forEach(n => {
+        const radial = new THREE.Vector3(n.x, 0, n.z).normalize();
+        poses.push({
+            pos: n.clone().add(radial.multiplyScalar(115)).add(new THREE.Vector3(0, 22, 0)),
+            look: n.clone(),
+        });
+    });
+    poses.push({ pos: new THREE.Vector3(0, -70, 330), look: new THREE.Vector3(0, -10, 0) });
+    return poses;
+})();
+
+// ─── Three.js state ──────────────────────────────────────────────────────────
+let renderer, scene, camera;
+let agentFBO_A, agentFBO_B, agentFBO_C, agentFBO_D;
+let agentTexRead_pos, agentTexWrite_pos, agentTexRead_dir, agentTexWrite_dir;
+let agentTexSize_;
+let pheroFBO_A, pheroFBO_B, pheroRead, pheroWrite;
+let historyRT, historyHead = 0;
+let trailGeometry, trailMaterial, trailMesh, trailUniforms;
+let computeScene, computeCamera;
+let agentPosUniforms, agentDirUniforms, decayUniforms, copyUniforms;
+let agentPosMesh, agentDirMesh, decayMesh_, copyMesh;
+let depositScene, depositCamera, depositPoints, depositMat;
+let attractScene, attractPoints, attractMat;
+let sceneRT, blurRT_A, blurRT_B;
+let blurUniforms, blurMesh, compositeUniforms, compositeMesh, postScene, postCamera;
+
+// Scroll / camera state
+let targetProgress = 0, progress = 0;
+const camPos = POSES[0].pos.clone(), camLook = POSES[0].look.clone();
+const _p = new THREE.Vector3(), _l = new THREE.Vector3();
+let mouseNX = 0, mouseNY = 0;
+
+// Bait
+const baitPos = new THREE.Vector3(0, 0, 0);
+let baitStrength = 0;
+
+// ─── GLSL ────────────────────────────────────────────────────────────────────
+const VERT_PASSTHROUGH = `
+attribute vec3 position;
+attribute vec2 uv;
+varying vec2 vUv;
+void main() { vUv = uv; gl_Position = vec4(position, 1.0); }`;
+
+const FRAG_COPY = `
+precision highp float;
+varying vec2 vUv;
+uniform sampler2D u_tex;
+void main() { gl_FragColor = texture2D(u_tex, vUv); }`;
+
+const SIM_COMMON = `
+precision highp float;
+precision highp sampler2D;
+varying vec2 vUv;
+uniform sampler2D u_posTex;
+uniform sampler2D u_dirTex;
+uniform sampler2D u_pheromon;
+uniform float u_sensorAngle;
+uniform float u_sensorDist;
+uniform float u_turnSpeed;
+uniform float u_moveSpeed;
+uniform float u_halfWorld;
+uniform float u_randomness;
+uniform vec2 u_seed;
+
+const float GRID_F  = ${GRID}.0;
+const float COLS_F  = ${COLS}.0;
+const float ATLAS_F = ${ATLAS}.0;
+
+float samplePhero(sampler2D ph, vec3 wp) {
+    float scale = GRID_F / (u_halfWorld * 2.0);
+    vec3 g = clamp((wp + u_halfWorld) * scale, 0.0, GRID_F - 1.0);
+    float sl  = floor(g.z);
+    float col = mod(sl, COLS_F);
+    float row = floor(sl / COLS_F);
+    vec2 uv = (vec2(col, row) * GRID_F + g.xy + 0.5) / ATLAS_F;
+    return texture2D(ph, uv).r;
+}
+vec3 rotVec(vec3 v, vec3 a, float angle) {
+    float c = cos(angle), s = sin(angle);
+    return v*c + cross(a,v)*s + a*dot(a,v)*(1.0-c);
+}
+float rand(vec2 p) {
+    p = fract(p * vec2(443.8975, 397.2973));
+    p += dot(p, p.yx + 19.19);
+    return fract((p.x + p.y) * p.x);
+}
+vec3 steer(vec3 pos, vec3 dir) {
+    vec3 up = abs(dir.y) < 0.9 ? vec3(0,1,0) : vec3(1,0,0);
+    vec3 a1 = normalize(cross(up, dir));
+    vec3 a2 = cross(dir, a1);
+
+    float sd = u_sensorDist, sa = u_sensorAngle;
+    float fwd   = samplePhero(u_pheromon, pos + dir*sd);
+    float left  = samplePhero(u_pheromon, pos + rotVec(dir,a1, sa)*sd);
+    float right = samplePhero(u_pheromon, pos + rotVec(dir,a1,-sa)*sd);
+    float up2   = samplePhero(u_pheromon, pos + rotVec(dir,a2, sa)*sd);
+    float down  = samplePhero(u_pheromon, pos + rotVec(dir,a2,-sa)*sd);
+
+    float r1 = rand(vUv * 127.1 + u_seed) - 0.5;
+    float r2 = rand(vUv * 269.5 + u_seed.yx) - 0.5;
+
+    vec3 newDir = dir;
+    float maxV = max(max(left,right),max(up2,down));
+    if (fwd >= maxV) {
+        newDir = rotVec(dir, a1, r1*u_randomness);
+        newDir = rotVec(newDir, a2, r2*u_randomness);
+    } else if (maxV == left)  newDir = rotVec(dir, a1,  u_turnSpeed);
+    else if   (maxV == right) newDir = rotVec(dir, a1, -u_turnSpeed);
+    else if   (maxV == up2)   newDir = rotVec(dir, a2,  u_turnSpeed);
+    else                      newDir = rotVec(dir, a2, -u_turnSpeed);
+
+    return normalize(newDir);
+}`;
+
+const FRAG_AGENT_UPDATE = SIM_COMMON + `
+void main() {
+    vec3 pos = texture2D(u_posTex, vUv).xyz;
+    vec3 dir = normalize(texture2D(u_dirTex, vUv).xyz);
+    vec3 newDir = steer(pos, dir);
+    vec3 newPos = pos + newDir * u_moveSpeed;
+    float hw = u_halfWorld;
+    if (abs(newPos.x) > hw) newPos.x = sign(newPos.x)*hw;
+    if (abs(newPos.y) > hw) newPos.y = sign(newPos.y)*hw;
+    if (abs(newPos.z) > hw) newPos.z = sign(newPos.z)*hw;
+    float hue = (atan(newDir.z, newDir.x) + 3.14159265) / 6.28318531;
+    gl_FragColor = vec4(newPos, hue);
+}`;
+
+const FRAG_AGENT_UPDATE_DIR = SIM_COMMON + `
+void main() {
+    vec3 pos = texture2D(u_posTex, vUv).xyz;
+    vec3 dir = normalize(texture2D(u_dirTex, vUv).xyz);
+    vec3 newDir = steer(pos, dir);
+    vec3 newPos = pos + newDir * u_moveSpeed;
+    float hw = u_halfWorld;
+    if (abs(newPos.x) > hw) newDir.x *= -1.0;
+    if (abs(newPos.y) > hw) newDir.y *= -1.0;
+    if (abs(newPos.z) > hw) newDir.z *= -1.0;
+    gl_FragColor = vec4(normalize(newDir), 1.0);
+}`;
+
+const ATLAS_PROJECT = `
+const float GRID_F  = ${GRID}.0;
+const float COLS_F  = ${COLS}.0;
+const float ATLAS_F = ${ATLAS}.0;
+vec2 atlasPos(vec3 wp, float hw) {
+    float scale = GRID_F / (hw * 2.0);
+    vec3 g = clamp((wp + hw) * scale, 0.0, GRID_F - 1.0);
+    float sl  = floor(g.z);
+    float col = mod(sl, COLS_F);
+    float row = floor(sl / COLS_F);
+    return (vec2(col, row) * GRID_F + g.xy + 0.5) / ATLAS_F;
+}`;
+
+const VERT_DEPOSIT = `
+precision highp float;
+precision highp sampler2D;
+attribute vec3 position;
+attribute vec2 uv;
+uniform sampler2D u_posTex;
+uniform float u_halfWorld;
+${ATLAS_PROJECT}
+void main() {
+    vec3 pos = texture2D(u_posTex, uv).xyz;
+    gl_Position = vec4(atlasPos(pos, u_halfWorld) * 2.0 - 1.0, 0.0, 1.0);
+    gl_PointSize = 1.0;
+}`;
+
+const FRAG_DEPOSIT = `
+precision highp float;
+void main() { gl_FragColor = vec4(0.25, 0.0, 0.0, 1.0); }`;
+
+// Attractor deposit: project nodes + cursor bait, each smeared across z slices.
+// position encodes (center index, z-offset in voxels, isBait flag).
+const VERT_ATTRACT = `
+precision highp float;
+attribute vec3 position;
+uniform vec3 u_centers[16];
+uniform float u_halfWorld;
+uniform float u_baitStr;
+varying float v_str;
+${ATLAS_PROJECT}
+void main() {
+    vec3 wp = u_centers[int(position.x)];
+    float voxel = (u_halfWorld * 2.0) / GRID_F;
+    wp.z += position.y * voxel;
+    float falloff = 1.0 - abs(position.y) * 0.28;
+    v_str = mix(0.32, 0.24 * u_baitStr, position.z) * falloff;
+    gl_Position = vec4(atlasPos(wp, u_halfWorld) * 2.0 - 1.0, 0.0, 1.0);
+    gl_PointSize = 3.0;
+}`;
+
+const FRAG_ATTRACT = `
+precision highp float;
+varying float v_str;
+void main() { gl_FragColor = vec4(v_str, 0.0, 0.0, 1.0); }`;
+
+const FRAG_DECAY = `
+precision highp float;
+precision highp sampler2D;
+varying vec2 vUv;
+uniform sampler2D u_phero;
+uniform float u_decay;
+void main() { gl_FragColor = vec4(texture2D(u_phero, vUv).r * u_decay, 0.0, 0.0, 1.0); }`;
+
+const VERT_TRAIL = `
+precision highp float;
+precision highp sampler2D;
+attribute vec2 a_uv;
+attribute float a_slot;
+uniform sampler2D u_hist;
+uniform float u_head;
+uniform float u_size;
+uniform float u_scale;
+uniform float u_hueShift;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+varying vec3 vColor;
+varying float vFade;
+
+const float H_F     = ${HISTORY}.0;
+const float HCOLS_F = ${HCOLS}.0;
+const float HROWS_F = ${HROWS}.0;
+
+vec3 hsl2rgb(float h, float s, float l) {
+    vec3 rgb = clamp(abs(mod(h*6.0 + vec3(0.0,4.0,2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+    return l + s * (rgb - 0.5) * (1.0 - abs(2.0*l - 1.0));
+}
+
+void main() {
+    float age = mod(u_head - a_slot + H_F, H_F);
+    vec2 tile = vec2(mod(a_slot, HCOLS_F), floor(a_slot / HCOLS_F));
+    vec2 uv   = (tile + a_uv) / vec2(HCOLS_F, HROWS_F);
+    vec4 t    = texture2D(u_hist, uv);
+
+    float fade = pow(1.0 - age / H_F, 1.6);
+    vFade  = fade;
+    vColor = hsl2rgb(fract(t.w + u_hueShift), 0.85, 0.55);
+
+    vec4 mv = modelViewMatrix * vec4(t.xyz, 1.0);
+    gl_Position  = projectionMatrix * mv;
+    gl_PointSize = u_size * (0.6 + 0.4 * fade) * (u_scale / max(-mv.z, 1.0));
+}`;
+
+const FRAG_TRAIL = `
+precision highp float;
+varying vec3 vColor;
+varying float vFade;
+void main() {
+    float d = length(gl_PointCoord - 0.5);
+    float a = smoothstep(0.5, 0.15, d) * vFade;
+    if (a < 0.003) discard;
+    gl_FragColor = vec4(vColor, a);
+}`;
+
+const FRAG_BLUR = `
+precision highp float;
+varying vec2 vUv;
+uniform sampler2D u_tex;
+uniform vec2 u_dir;
+void main() {
+    vec3 c = texture2D(u_tex, vUv).rgb * 0.227027;
+    c += texture2D(u_tex, vUv + u_dir * 1.3846).rgb * 0.3162162;
+    c += texture2D(u_tex, vUv - u_dir * 1.3846).rgb * 0.3162162;
+    c += texture2D(u_tex, vUv + u_dir * 3.2308).rgb * 0.0702703;
+    c += texture2D(u_tex, vUv - u_dir * 3.2308).rgb * 0.0702703;
+    gl_FragColor = vec4(c, 1.0);
+}`;
+
+const FRAG_COMPOSITE = `
+precision highp float;
+varying vec2 vUv;
+uniform sampler2D u_scene;
+uniform sampler2D u_bloomTex;
+uniform float u_strength;
+void main() {
+    vec3 c = texture2D(u_scene, vUv).rgb
+           + texture2D(u_bloomTex, vUv).rgb * u_strength;
+    c = 1.0 - exp(-c * 1.25);
+    float vig = 1.0 - 0.35 * pow(length(vUv - 0.5) * 1.35, 2.2);
+    gl_FragColor = vec4(c * vig, 1.0);
+}`;
+
+// ─── Utilities ───────────────────────────────────────────────────────────────
+function createFloatTexture(w, h, data) {
+    const tex = new THREE.DataTexture(
+        data || new Float32Array(w*h*4), w, h,
+        THREE.RGBAFormat, THREE.FloatType
+    );
+    tex.minFilter = tex.magFilter = THREE.NearestFilter;
+    tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+    tex.needsUpdate = true;
+    return tex;
+}
+
+function createRenderTarget(w, h, type, filter) {
+    return new THREE.WebGLRenderTarget(w, h, {
+        type: type || THREE.FloatType, format: THREE.RGBAFormat,
+        minFilter: filter || THREE.NearestFilter, magFilter: filter || THREE.NearestFilter,
+        wrapS: THREE.ClampToEdgeWrapping, wrapT: THREE.ClampToEdgeWrapping,
+        depthBuffer: false, stencilBuffer: false,
+    });
+}
+
+function makeQuadMesh(uniforms, vertSrc, fragSrc) {
+    const mat = new THREE.RawShaderMaterial({
+        uniforms, vertexShader: vertSrc, fragmentShader: fragSrc,
+        depthTest: false, depthWrite: false,
+    });
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(
+        new Float32Array([-1,-1,0, 1,-1,0, -1,1,0, 1,-1,0, 1,1,0, -1,1,0]), 3));
+    geo.setAttribute('uv', new THREE.BufferAttribute(
+        new Float32Array([0,0, 1,0, 0,1, 1,0, 1,1, 0,1]), 2));
+    return new THREE.Mesh(geo, mat);
+}
+
+function blitToFBO(srcTex, targetFBO) {
+    copyUniforms.u_tex.value = srcTex;
+    computeScene.add(copyMesh);
+    renderer.setRenderTarget(targetFBO);
+    renderer.render(computeScene, computeCamera);
+    computeScene.remove(copyMesh);
+    renderer.setRenderTarget(null);
+}
+
+function blitToHistoryTile(srcTex, tileIndex) {
+    const ts  = agentTexSize_;
+    const col = tileIndex % HCOLS;
+    const row = Math.floor(tileIndex / HCOLS);
+    historyRT.viewport.set(col * ts, row * ts, ts, ts);
+    historyRT.scissor.set(col * ts, row * ts, ts, ts);
+    historyRT.scissorTest = true;
+    copyUniforms.u_tex.value = srcTex;
+    const oldAuto = renderer.autoClear;
+    renderer.autoClear = false;
+    computeScene.add(copyMesh);
+    renderer.setRenderTarget(historyRT);
+    renderer.render(computeScene, computeCamera);
+    computeScene.remove(copyMesh);
+    renderer.autoClear = oldAuto;
+    renderer.setRenderTarget(null);
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+function initAgentTextures() {
+    const n  = config.agentCount;
+    const ts = agentTexSize(n);
+    agentTexSize_ = ts;
+
+    const posData = new Float32Array(ts*ts*4);
+    const dirData = new Float32Array(ts*ts*4);
+    const hw = config.worldSize / 2;
+
+    for (let i = 0; i < n; i++) {
+        // Spawn in soft spheres around project nodes (dense core, feathered edge)
+        const node = NODES[i % NODES.length];
+        const radius = 26 * Math.pow(Math.random(), 0.45);
+        const theta  = Math.random() * 2 * Math.PI;
+        const phi    = Math.acos(2 * Math.random() - 1);
+        const x = node.x + radius * Math.sin(phi) * Math.cos(theta);
+        const y = node.y + radius * Math.sin(phi) * Math.sin(theta);
+        const z = node.z + radius * Math.cos(phi);
+        let dx = Math.random()-0.5, dy = Math.random()-0.5, dz = Math.random()-0.5;
+        const len = Math.sqrt(dx*dx+dy*dy+dz*dz) || 1;
+        dx /= len; dy /= len; dz /= len;
+        const hue = (Math.atan2(dz, dx) + Math.PI) / (2 * Math.PI);
+        const b = i*4;
+        posData[b]=Math.max(-hw,Math.min(hw,x));
+        posData[b+1]=Math.max(-hw,Math.min(hw,y));
+        posData[b+2]=Math.max(-hw,Math.min(hw,z));
+        posData[b+3]=hue;
+        dirData[b]=dx; dirData[b+1]=dy; dirData[b+2]=dz; dirData[b+3]=1;
+    }
+
+    agentFBO_A = createRenderTarget(ts, ts);
+    agentFBO_B = createRenderTarget(ts, ts);
+    agentFBO_C = createRenderTarget(ts, ts);
+    agentFBO_D = createRenderTarget(ts, ts);
+
+    const posTex = createFloatTexture(ts, ts, posData);
+    const dirTex = createFloatTexture(ts, ts, dirData);
+    blitToFBO(posTex, agentFBO_A);
+    blitToFBO(dirTex, agentFBO_C);
+    posTex.dispose(); dirTex.dispose();
+
+    agentTexRead_pos  = agentFBO_A; agentTexWrite_pos = agentFBO_B;
+    agentTexRead_dir  = agentFBO_C; agentTexWrite_dir = agentFBO_D;
+}
+
+function initHistory() {
+    const ts = agentTexSize_;
+    historyRT = createRenderTarget(ts * HCOLS, ts * HROWS);
+    historyHead = 0;
+    for (let i = 0; i < HISTORY; i++) blitToHistoryTile(agentTexRead_pos.texture, i);
+}
+
+function initPheromone() {
+    const opts = {
+        type: THREE.FloatType, format: THREE.RGBAFormat,
+        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
+        depthBuffer: false,
+    };
+    pheroFBO_A = new THREE.WebGLRenderTarget(ATLAS, ATLAS, opts);
+    pheroFBO_B = new THREE.WebGLRenderTarget(ATLAS, ATLAS, opts);
+    renderer.setRenderTarget(pheroFBO_A); renderer.clearColor();
+    renderer.setRenderTarget(pheroFBO_B); renderer.clearColor();
+    renderer.setRenderTarget(null);
+    pheroRead  = pheroFBO_A;
+    pheroWrite = pheroFBO_B;
+}
+
+function buildComputeGraph() {
+    const hw = config.worldSize / 2;
+    const simUniforms = () => ({
+        u_posTex:      { value: null },
+        u_dirTex:      { value: null },
+        u_pheromon:    { value: null },
+        u_sensorAngle: { value: config.sensorAngle },
+        u_sensorDist:  { value: config.sensorDist },
+        u_turnSpeed:   { value: config.turnSpeed },
+        u_moveSpeed:   { value: config.moveSpeed },
+        u_halfWorld:   { value: hw },
+        u_randomness:  { value: config.randomness },
+        u_seed:        { value: new THREE.Vector2() },
+    });
+    agentPosUniforms = simUniforms();
+    agentPosMesh = makeQuadMesh(agentPosUniforms, VERT_PASSTHROUGH, FRAG_AGENT_UPDATE);
+    agentDirUniforms = simUniforms();
+    agentDirMesh = makeQuadMesh(agentDirUniforms, VERT_PASSTHROUGH, FRAG_AGENT_UPDATE_DIR);
+    decayUniforms = { u_phero: { value: null }, u_decay: { value: config.decay } };
+    decayMesh_ = makeQuadMesh(decayUniforms, VERT_PASSTHROUGH, FRAG_DECAY);
+}
+
+function buildDepositPoints() {
+    const hw = config.worldSize / 2;
+    const n  = config.agentCount;
+    const ts = agentTexSize_;
+
+    depositScene  = new THREE.Scene();
+    depositCamera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+
+    const duvs = new Float32Array(n * 2);
+    for (let i = 0; i < n; i++) {
+        duvs[i*2]   = ((i % ts) + 0.5) / ts;
+        duvs[i*2+1] = (Math.floor(i / ts) + 0.5) / ts;
+    }
+    const dGeo = new THREE.BufferGeometry();
+    dGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+    dGeo.setAttribute('uv',       new THREE.BufferAttribute(duvs, 2));
+    depositMat = new THREE.RawShaderMaterial({
+        uniforms: { u_posTex: { value: null }, u_halfWorld: { value: hw } },
+        vertexShader: VERT_DEPOSIT, fragmentShader: FRAG_DEPOSIT,
+        blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false,
+    });
+    depositPoints = new THREE.Points(dGeo, depositMat);
+    depositScene.add(depositPoints);
+
+    // Attractor cloud: (nodes + bait) × 5 z-slices each
+    attractScene = new THREE.Scene();
+    const centers = NODES.length + 1;           // last slot = cursor bait
+    const pts = new Float32Array(centers * 5 * 3);
+    let k = 0;
+    for (let c = 0; c < centers; c++) {
+        for (let z = -2; z <= 2; z++) {
+            pts[k*3]   = c;                     // center index
+            pts[k*3+1] = z;                     // z-offset in voxels
+            pts[k*3+2] = c === centers - 1 ? 1 : 0; // isBait
+            k++;
+        }
+    }
+    const aGeo = new THREE.BufferGeometry();
+    aGeo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+    const centerVecs = [];
+    for (let i = 0; i < 16; i++) centerVecs.push(i < NODES.length ? NODES[i] : baitPos);
+    attractMat = new THREE.RawShaderMaterial({
+        uniforms: {
+            u_centers:   { value: centerVecs },
+            u_halfWorld: { value: hw },
+            u_baitStr:   { value: 0 },
+        },
+        vertexShader: VERT_ATTRACT, fragmentShader: FRAG_ATTRACT,
+        blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false,
+    });
+    attractPoints = new THREE.Points(aGeo, attractMat);
+    attractPoints.frustumCulled = false;
+    attractScene.add(attractPoints);
+}
+
+function buildTrailMesh() {
+    const n  = config.agentCount;
+    const ts = agentTexSize_;
+    const total = n * HISTORY;
+
+    const uvs   = new Float32Array(total * 2);
+    const slots = new Float32Array(total);
+    let k = 0;
+    for (let i = 0; i < n; i++) {
+        const u = ((i % ts) + 0.5) / ts;
+        const v = (Math.floor(i / ts) + 0.5) / ts;
+        for (let h = 0; h < HISTORY; h++) {
+            uvs[k*2] = u; uvs[k*2+1] = v; slots[k] = h; k++;
+        }
+    }
+
+    trailGeometry = new THREE.BufferGeometry();
+    trailGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(total * 3), 3));
+    trailGeometry.setAttribute('a_uv',   new THREE.BufferAttribute(uvs, 2));
+    trailGeometry.setAttribute('a_slot', new THREE.BufferAttribute(slots, 1));
+
+    trailUniforms = {
+        u_hist:     { value: historyRT.texture },
+        u_head:     { value: 0 },
+        u_size:     { value: config.trailSize },
+        u_scale:    { value: innerHeight * 0.5 },
+        u_hueShift: { value: 0 },
+    };
+    trailMaterial = new THREE.RawShaderMaterial({
+        uniforms: trailUniforms,
+        vertexShader: VERT_TRAIL, fragmentShader: FRAG_TRAIL,
+        transparent: true, blending: THREE.AdditiveBlending,
+        depthTest: false, depthWrite: false,
+    });
+    trailMesh = new THREE.Points(trailGeometry, trailMaterial);
+    trailMesh.frustumCulled = false;
+    scene.add(trailMesh);
+}
+
+function buildPost() {
+    postScene  = new THREE.Scene();
+    postCamera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+    sceneRT  = createRenderTarget(innerWidth, innerHeight, THREE.HalfFloatType, THREE.LinearFilter);
+    blurRT_A = createRenderTarget(Math.max(innerWidth >> 2, 1), Math.max(innerHeight >> 2, 1), THREE.HalfFloatType, THREE.LinearFilter);
+    blurRT_B = createRenderTarget(Math.max(innerWidth >> 2, 1), Math.max(innerHeight >> 2, 1), THREE.HalfFloatType, THREE.LinearFilter);
+    blurUniforms = { u_tex: { value: null }, u_dir: { value: new THREE.Vector2() } };
+    blurMesh = makeQuadMesh(blurUniforms, VERT_PASSTHROUGH, FRAG_BLUR);
+    compositeUniforms = {
+        u_scene: { value: null }, u_bloomTex: { value: null },
+        u_strength: { value: config.bloom },
+    };
+    compositeMesh = makeQuadMesh(compositeUniforms, VERT_PASSTHROUGH, FRAG_COMPOSITE);
+}
+
+function postPass(mesh, target) {
+    postScene.add(mesh);
+    renderer.setRenderTarget(target);
+    renderer.render(postScene, postCamera);
+    postScene.remove(mesh);
+}
+
+// ─── Sim step ────────────────────────────────────────────────────────────────
+let frameCount = 0;
+const frameSeed = new THREE.Vector2();
+
+function updateSimUniforms(u) {
+    u.u_posTex.value   = agentTexRead_pos.texture;
+    u.u_dirTex.value   = agentTexRead_dir.texture;
+    u.u_pheromon.value = pheroRead.texture;
+    u.u_seed.value.copy(frameSeed);
+}
+
+function simStep() {
+    frameSeed.set(Math.random() * 61.0, Math.random() * 73.0);
+
+    updateSimUniforms(agentPosUniforms);
+    computeScene.add(agentPosMesh);
+    renderer.setRenderTarget(agentTexWrite_pos);
+    renderer.render(computeScene, computeCamera);
+    computeScene.remove(agentPosMesh);
+
+    updateSimUniforms(agentDirUniforms);
+    computeScene.add(agentDirMesh);
+    renderer.setRenderTarget(agentTexWrite_dir);
+    renderer.render(computeScene, computeCamera);
+    computeScene.remove(agentDirMesh);
+
+    let tmp;
+    tmp = agentTexRead_pos; agentTexRead_pos = agentTexWrite_pos; agentTexWrite_pos = tmp;
+    tmp = agentTexRead_dir; agentTexRead_dir = agentTexWrite_dir; agentTexWrite_dir = tmp;
+
+    decayUniforms.u_phero.value = pheroRead.texture;
+    computeScene.add(decayMesh_);
+    renderer.setRenderTarget(pheroWrite);
+    renderer.render(computeScene, computeCamera);
+    computeScene.remove(decayMesh_);
+
+    renderer.setRenderTarget(pheroWrite);
+    renderer.autoClear = false;
+    depositMat.uniforms.u_posTex.value = agentTexRead_pos.texture;
+    renderer.render(depositScene, depositCamera);
+    attractMat.uniforms.u_baitStr.value = baitStrength;
+    renderer.render(attractScene, depositCamera);
+    renderer.autoClear = true;
+
+    tmp = pheroRead; pheroRead = pheroWrite; pheroWrite = tmp;
+}
+
+// ─── Frame ───────────────────────────────────────────────────────────────────
+function renderFrame() {
+    frameCount++;
+
+    // Extra sim steps early on so the network is formed by the time anyone scrolls
+    const steps = frameCount < WARMUP_FRAMES ? 4 : 1;
+    for (let s = 0; s < steps; s++) simStep();
+
+    if (frameCount % RECORD_EVERY === 0) {
+        historyHead = (historyHead + 1) % HISTORY;
+        blitToHistoryTile(agentTexRead_pos.texture, historyHead);
+    }
+    trailUniforms.u_head.value = historyHead;
+
+    // Scroll-driven camera with damping
+    const damp = reducedMotion ? 0.25 : 0.07;
+    progress += (targetProgress - progress) * damp;
+    poseAt(progress, _p, _l);
+    camPos.lerp(_p, 1);
+    camLook.lerp(_l, 1);
+
+    camera.position.copy(camPos);
+    if (!reducedMotion) {
+        // gentle mouse parallax
+        const right = new THREE.Vector3().subVectors(camLook, camPos).normalize().cross(camera.up);
+        camera.position.addScaledVector(right, mouseNX * 7);
+        camera.position.y += -mouseNY * 5;
+    }
+    camera.lookAt(camLook);
+
+    // hue drifts slowly as you descend
+    trailUniforms.u_hueShift.value = progress * 0.06;
+
+    // bait decays until the mouse moves again
+    baitStrength *= 0.96;
+    updateBaitWorldPos();
+
+    updateContentOpacity();
+
+    // Render + bloom
+    renderer.setRenderTarget(sceneRT);
+    renderer.render(scene, camera);
+
+    blurUniforms.u_tex.value = sceneRT.texture;
+    blurUniforms.u_dir.value.set(1 / blurRT_A.width, 0);
+    postPass(blurMesh, blurRT_A);
+    blurUniforms.u_tex.value = blurRT_A.texture;
+    blurUniforms.u_dir.value.set(0, 1 / blurRT_A.height);
+    postPass(blurMesh, blurRT_B);
+    blurUniforms.u_tex.value = blurRT_B.texture;
+    blurUniforms.u_dir.value.set(2 / blurRT_A.width, 0);
+    postPass(blurMesh, blurRT_A);
+    compositeUniforms.u_scene.value    = sceneRT.texture;
+    compositeUniforms.u_bloomTex.value = blurRT_A.texture;
+    postPass(compositeMesh, null);
+}
+
+function poseAt(p, outPos, outLook) {
+    const max = POSES.length - 1;
+    p = Math.max(0, Math.min(max, p));
+    const i = Math.min(Math.floor(p), max - 1);
+    let t = p - i;
+    t = t * t * (3 - 2 * t);
+    outPos.lerpVectors(POSES[i].pos, POSES[i + 1].pos, t);
+    outLook.lerpVectors(POSES[i].look, POSES[i + 1].look, t);
+}
+
+const _ray = new THREE.Vector3();
+function updateBaitWorldPos() {
+    if (baitStrength < 0.01) return;
+    _ray.set(mouseNX, -mouseNY, 0.5).unproject(camera).sub(camera.position).normalize();
+    const dist = camera.position.distanceTo(camLook);
+    baitPos.copy(camera.position).addScaledVector(_ray, dist);
+    const lim = config.worldSize / 2 - 8;
+    baitPos.x = Math.max(-lim, Math.min(lim, baitPos.x));
+    baitPos.y = Math.max(-lim, Math.min(lim, baitPos.y));
+    baitPos.z = Math.max(-lim, Math.min(lim, baitPos.z));
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    renderFrame();
+}
+
+// ─── DOM: build sections, rail, contact ──────────────────────────────────────
+function fmtCoord(v) {
+    const n = Math.round(v);
+    return (n < 0 ? '−' : '+') + String(Math.abs(n)).padStart(3, '0');
+}
+
+function buildDOM() {
+    const content = document.getElementById('content');
+    const rail = document.getElementById('rail');
+    const nn = String(PROJECTS.length).padStart(2, '0');
+
+    PROJECTS.forEach((proj, i) => {
+        const node = NODES[i];
+        const sec = document.createElement('section');
+        sec.className = 'project' + (i % 2 ? ' right' : '');
+        sec.innerHTML = `
+            <div class="card">
+                <div class="eyebrow">
+                    <span>specimen ${String(i+1).padStart(2,'0')} / ${nn}</span>
+                    <span class="coords">x${fmtCoord(node.x)} y${fmtCoord(node.y)} z${fmtCoord(node.z)}</span>
+                </div>
+                <h2>${proj.title}</h2>
+                <p>${proj.desc}</p>
+                <div class="tags">${proj.tags.map(t => `<span>${t}</span>`).join('')}</div>
+                <a class="visit" href="${proj.link}">view specimen →</a>
+            </div>`;
+        content.appendChild(sec);
+
+        const tick = document.createElement('div');
+        tick.className = 'tick';
+        tick.innerHTML = `<span>${String(i+1).padStart(2,'0')}</span><span class="dash"></span>`;
+        rail.appendChild(tick);
+    });
+
+    const contact = document.createElement('section');
+    contact.id = 'contact';
+    contact.innerHTML = `
+        <div class="card bare">
+            <h2>${CONTACT.heading}</h2>
+            <div class="links">
+                ${CONTACT.links.map(l => `<a href="${l.href}">${l.label}</a>`).join('')}
+            </div>
+            <div class="fineprint">background organism: physarum polycephalum, simulated · ${config.agentCount.toLocaleString()} agents on your gpu</div>
+        </div>`;
+    content.appendChild(contact);
+}
+
+const cards = [];
+function collectCards() {
+    document.querySelectorAll('#content section').forEach((sec, i) => {
+        cards.push({ el: sec.querySelector('.card'), idx: i });
+    });
+}
+
+function updateContentOpacity() {
+    for (const c of cards) {
+        const d = Math.abs(progress - c.idx);
+        const o = Math.max(0, 1 - d * 1.5);
+        c.el.style.opacity = o.toFixed(3);
+        if (!reducedMotion) {
+            const shift = Math.max(-1, Math.min(1, progress - c.idx)) * -26;
+            c.el.style.transform = `translateY(${shift.toFixed(1)}px)`;
+        }
+    }
+    // rail highlight
+    const active = Math.round(progress) - 1; // sections 1..N are projects
+    document.querySelectorAll('#rail .tick').forEach((t, i) => {
+        t.classList.toggle('active', i === active);
+    });
+}
+
+function setupInput() {
+    const onScroll = () => {
+        const max = document.documentElement.scrollHeight - innerHeight;
+        const f = max > 0 ? scrollY / max : 0;
+        targetProgress = f * (POSES.length - 1);
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    addEventListener('mousemove', e => {
+        mouseNX = (e.clientX / innerWidth) * 2 - 1;
+        mouseNY = (e.clientY / innerHeight) * 2 - 1;
+        baitStrength = 1;
+    }, { passive: true });
+
+    addEventListener('touchmove', e => {
+        if (!e.touches.length) return;
+        mouseNX = (e.touches[0].clientX / innerWidth) * 2 - 1;
+        mouseNY = (e.touches[0].clientY / innerHeight) * 2 - 1;
+        baitStrength = 1;
+    }, { passive: true });
+
+    addEventListener('keydown', e => {
+        if (e.key === 'h' || e.key === 'H') {
+            const chrome = document.getElementById('chrome');
+            const content = document.getElementById('content');
+            const hidden = chrome.style.visibility === 'hidden';
+            chrome.style.visibility = content.style.visibility = hidden ? 'visible' : 'hidden';
+        }
+    });
+
+    addEventListener('resize', () => {
+        if (!renderer || !sceneRT) return; // fallback path has no sim
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+        sceneRT.setSize(innerWidth, innerHeight);
+        blurRT_A.setSize(Math.max(innerWidth >> 2, 1), Math.max(innerHeight >> 2, 1));
+        blurRT_B.setSize(Math.max(innerWidth >> 2, 1), Math.max(innerHeight >> 2, 1));
+        trailUniforms.u_scale.value = innerHeight * 0.5;
+    });
+}
+
+// ─── Entry point ──────────────────────────────────────────────────────────────
+function init() {
+    scene    = new THREE.Scene();
+    camera   = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 2000);
+    renderer = new THREE.WebGLRenderer({ antialias: false });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    document.getElementById('container').appendChild(renderer.domElement);
+
+    const gl = renderer.getContext();
+    if (!gl.getExtension('EXT_color_buffer_float')) {
+        // graceful fallback: static dark page, content still readable
+        document.getElementById('container').remove();
+        return finishDOM();
+    }
+    gl.getExtension('OES_texture_float_linear');
+
+    computeScene  = new THREE.Scene();
+    computeCamera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+    copyUniforms  = { u_tex: { value: null } };
+    copyMesh      = makeQuadMesh(copyUniforms, VERT_PASSTHROUGH, FRAG_COPY);
+
+    initAgentTextures();
+    initHistory();
+    initPheromone();
+    buildComputeGraph();
+    buildDepositPoints();
+    buildTrailMesh();
+    buildPost();
+    finishDOM();
+    animate();
+}
+
+function finishDOM() {
+    buildDOM();
+    collectCards();
+    setupInput();
+}
+
+init();
+</script>
+</body>
 </html>
