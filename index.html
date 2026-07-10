@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>william m.</title>
+<title>william m. — coding portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -145,6 +145,67 @@
     }
     .card a.visit:hover { border-color: var(--accent); }
 
+    /* ── in-scene project cards ──────────────────────────────────
+       These live as real 3D objects the camera flies to; scrolling
+       just moves the camera, not the cards. */
+    #css3d-container {
+        position: fixed; inset: 0;
+        z-index: 1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    #css3d-camera {
+        transform-style: preserve-3d;
+        position: absolute;
+        left: 0; top: 0;
+    }
+    .card3d {
+        position: absolute;
+        width: 440px;
+        padding: 30px 32px 28px;
+        background: var(--card-bg);
+        border: 1px solid var(--hairline);
+        backdrop-filter: blur(7px);
+        -webkit-backdrop-filter: blur(7px);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        transition: opacity 0.3s linear;
+        pointer-events: auto;
+    }
+    .card3d::before, .card3d::after { content: ''; position: absolute; width: 15px; height: 15px; }
+    .card3d::before { top: -1px; left: -1px; border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
+    .card3d::after  { bottom: -1px; right: -1px; border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); }
+    .card3d .eyebrow {
+        display: flex; justify-content: space-between; gap: 12px;
+        font-size: 9px; letter-spacing: 0.2em; color: var(--dim);
+        text-transform: uppercase; margin-bottom: 16px;
+    }
+    .card3d .coords { color: var(--dim); opacity: 0.8; letter-spacing: 0.1em; }
+    .card3d h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 500; font-size: 26px; letter-spacing: -0.01em;
+        margin-bottom: 12px;
+    }
+    .card3d p { font-size: 12px; line-height: 1.75; color: #b9c7c4; }
+    .card3d .tags { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 7px; }
+    .card3d .tags span {
+        font-size: 9px; letter-spacing: 0.12em; color: var(--dim);
+        border: 1px solid var(--hairline); padding: 3px 8px;
+        text-transform: uppercase;
+    }
+    .card3d a.visit {
+        display: inline-block; margin-top: 20px;
+        font-size: 11px; letter-spacing: 0.1em;
+        color: var(--accent); text-decoration: none;
+        border-bottom: 1px solid rgba(165,243,221,0.35);
+        padding-bottom: 2px;
+    }
+    .card3d a.visit:hover { border-color: var(--accent); }
+    @media (max-width: 768px) {
+        .card3d { width: 280px; padding: 22px 22px 20px; }
+        .card3d h2 { font-size: 21px; }
+    }
+
     /* contact */
     #contact { justify-content: center; text-align: center; }
     #contact h2 {
@@ -176,7 +237,7 @@
 <div id="chrome">
     <div id="header">
         <div class="name">william m.</div>
-        <div class="role">software · machine learning · agentic ai</div>
+        <div class="role">software · simulation · systems</div>
     </div>
     <div id="rail"></div>
 </div>
@@ -184,11 +245,11 @@
 <div id="content">
     <section id="hero">
         <div class="card bare">
-            <div class="eyebrow">portfolio of</div>
+            <div class="eyebrow">coding portflio</div>
             <h1>william m.</h1>
-            <!--<div class="sub">seven projects, connected by a slime mold that is solving them right now</div> -->
+            <div class="sub">idk what to put here</div>
         </div>
-        <div class="scrollcue">scroll to descend · 07 specimens</div>
+        <div class="scrollcue">scroll to explore</div>
     </section>
     <!-- project sections generated from PROJECTS below -->
 </div>
@@ -206,17 +267,17 @@
 const PROJECTS = [
     { title: 'Project One',   desc: 'One or two sentences on what it is, why it exists, and the part you are proud of. Placeholder copy — replace me.', tags: ['webgl', 'simulation'],      link: '#' },
     { title: 'Project Two',   desc: 'Placeholder. Concrete beats clever: what it does, who used it, one number if you have one.',                        tags: ['typescript', 'tooling'],    link: '#' },
-    { title: 'Project Three', desc: 'Placeholder description for the third specimen in the collection.',                                                 tags: ['systems'],                  link: '#' },
-    { title: 'Project Four',  desc: 'Placeholder description for the fourth specimen in the collection.',                                                tags: ['data', 'viz'],              link: '#' },
-    { title: 'Project Five',  desc: 'Placeholder description for the fifth specimen in the collection.',                                                 tags: ['audio'],                    link: '#' },
-    { title: 'Project Six',   desc: 'Placeholder description for the sixth specimen in the collection.',                                                 tags: ['ml'],                       link: '#' },
-    { title: 'Project Seven', desc: 'Placeholder description for the seventh specimen in the collection.',                                               tags: ['hardware', 'firmware'],     link: '#' },
+    { title: 'Project Three', desc: 'Placeholder description for the third project in the collection.',                                                 tags: ['systems'],                  link: '#' },
+    { title: 'Project Four',  desc: 'Placeholder description for the fourth project in the collection.',                                                tags: ['data', 'viz'],              link: '#' },
+    { title: 'Project Five',  desc: 'Placeholder description for the fifth project in the collection.',                                                 tags: ['audio'],                    link: '#' },
+    { title: 'Project Six',   desc: 'Placeholder description for the sixth project in the collection.',                                                 tags: ['ml'],                       link: '#' },
+    { title: 'Project Seven', desc: 'Placeholder description for the seventh project in the collection.',                                               tags: ['hardware', 'firmware'],     link: '#' },
 ];
 const CONTACT = {
-    heading: 'want to grow something together?',
+    heading: 'want to work on something together?',
     links: [
-        { label: 'email',  href: 'mailto:you@example.com' },
-        { label: 'github', href: 'https://github.com/yourhandle' },
+        { label: 'email',  href: 'wjm16@hotmail.com' },
+        { label: 'github', href: 'https://github.com/William7042' },
         { label: 'resume', href: '#' },
     ],
 };
@@ -226,7 +287,7 @@ const isMobile = matchMedia('(max-width: 768px)').matches || matchMedia('(pointe
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const config = {
-    agentCount:  isMobile ? 14000 : 40000,
+    agentCount:  isMobile ? 6000 : 40000,
     sensorAngle: 35 * Math.PI / 180,
     sensorDist:  15,
     turnSpeed:   0.12,
@@ -252,13 +313,29 @@ const NODES = PROJECTS.map((p, i) => {
     return new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r);
 });
 
+// ─── Random blob spawn points: 7 big clusters scattered through the cube ───
+// Independent from the project nodes — agents start here, then the
+// pheromone attractors still pull the network toward each project over time.
+const SPAWN_POINTS = (() => {
+    const hw = config.worldSize / 2 * 0.55; // keep clusters off the hard walls
+    const pts = [];
+    for (let i = 0; i < 7; i++) {
+        pts.push(new THREE.Vector3(
+            (Math.random() * 2 - 1) * hw,
+            (Math.random() * 2 - 1) * hw,
+            (Math.random() * 2 - 1) * hw
+        ));
+    }
+    return pts;
+})();
+
 // Camera poses: hero overview → one pose per node → contact pull-back
 const POSES = (() => {
     const poses = [{ pos: new THREE.Vector3(0, 55, 330), look: new THREE.Vector3(0, 0, 0) }];
     NODES.forEach(n => {
         const radial = new THREE.Vector3(n.x, 0, n.z).normalize();
         poses.push({
-            pos: n.clone().add(radial.multiplyScalar(115)).add(new THREE.Vector3(0, 22, 0)),
+            pos: n.clone().add(radial.multiplyScalar(85)).add(new THREE.Vector3(0, 22, 0)),
             look: n.clone(),
         });
     });
@@ -281,6 +358,16 @@ let depositScene, depositCamera, depositPoints, depositMat;
 let attractScene, attractPoints, attractMat;
 let sceneRT, blurRT_A, blurRT_B;
 let blurUniforms, blurMesh, compositeUniforms, compositeMesh, postScene, postCamera;
+
+// Camera path: Catmull-Rom splines through all poses so the ride has no
+// hard joints at each node — this is what kills the "chop" on fast scroll.
+let posCurve, lookCurve;
+
+// In-scene project cards: real 3D objects positioned at each node. Scrolling
+// only ever moves the camera (above); these never move.
+const CARD_WORLD_WIDTH = 90; // world units the 440px-wide card should occupy
+let css3dContainer, css3dCameraEl, css3dObjects = [];
+let widthHalf = innerWidth / 2, heightHalf = innerHeight / 2;
 
 // Scroll / camera state
 let targetProgress = 0, progress = 0;
@@ -611,9 +698,9 @@ function initAgentTextures() {
     const hw = config.worldSize / 2;
 
     for (let i = 0; i < n; i++) {
-        // Spawn in soft spheres around project nodes (dense core, feathered edge)
-        const node = NODES[i % NODES.length];
-        const radius = 26 * Math.pow(Math.random(), 0.45);
+        // Spawn in soft blobs around 7 randomly-placed points in the cube
+        const node = SPAWN_POINTS[i % SPAWN_POINTS.length];
+        const radius = 38 * Math.pow(Math.random(), 0.45);
         const theta  = Math.random() * 2 * Math.PI;
         const phi    = Math.acos(2 * Math.random() - 1);
         const x = node.x + radius * Math.sin(phi) * Math.cos(theta);
@@ -806,6 +893,125 @@ function postPass(mesh, target) {
     postScene.remove(mesh);
 }
 
+// ─── CSS3D card layer ─────────────────────────────────────────────────────
+// A small hand-rolled version of three.js's CSS3DRenderer: it turns each
+// card's world position/rotation into a CSS matrix3d so real DOM elements
+// sit "inside" the WebGL scene and get the same perspective the camera sees.
+// The camera transform is recomputed every frame; each card's own transform
+// is fixed once, since the cards themselves never move.
+function epsilon(v) { return Math.abs(v) < 1e-10 ? 0 : v; }
+
+function getCameraCSSMatrix(m) {
+    const e = m.elements;
+    return 'matrix3d(' +
+        epsilon(e[0])  + ',' + epsilon(-e[1]) + ',' + epsilon(e[2])  + ',' + epsilon(e[3])  + ',' +
+        epsilon(e[4])  + ',' + epsilon(-e[5]) + ',' + epsilon(e[6])  + ',' + epsilon(e[7])  + ',' +
+        epsilon(e[8])  + ',' + epsilon(-e[9]) + ',' + epsilon(e[10]) + ',' + epsilon(e[11]) + ',' +
+        epsilon(e[12]) + ',' + epsilon(-e[13])+ ',' + epsilon(e[14]) + ',' + epsilon(e[15]) +
+    ')';
+}
+
+function getObjectCSSMatrix(m) {
+    const e = m.elements;
+    return 'translate(-50%,-50%) matrix3d(' +
+        epsilon(e[0])  + ',' + epsilon(e[1])  + ',' + epsilon(e[2])  + ',' + epsilon(e[3])  + ',' +
+        epsilon(-e[4]) + ',' + epsilon(-e[5]) + ',' + epsilon(-e[6]) + ',' + epsilon(-e[7]) + ',' +
+        epsilon(e[8])  + ',' + epsilon(e[9])  + ',' + epsilon(e[10]) + ',' + epsilon(e[11]) + ',' +
+        epsilon(e[12]) + ',' + epsilon(e[13]) + ',' + epsilon(e[14]) + ',' + epsilon(e[15]) +
+    ')';
+}
+
+function buildCSS3DCards() {
+    css3dContainer = document.createElement('div');
+    css3dContainer.id = 'css3d-container';
+    css3dContainer.style.width = innerWidth + 'px';
+    css3dContainer.style.height = innerHeight + 'px';
+    document.body.appendChild(css3dContainer);
+
+    css3dCameraEl = document.createElement('div');
+    css3dCameraEl.id = 'css3d-camera';
+    css3dCameraEl.style.width = innerWidth + 'px';
+    css3dCameraEl.style.height = innerHeight + 'px';
+    css3dContainer.appendChild(css3dCameraEl);
+
+    const scale = CARD_WORLD_WIDTH / 440;
+    const nn = String(PROJECTS.length).padStart(2, '0');
+    const helper = new THREE.Object3D();
+
+    PROJECTS.forEach((proj, i) => {
+        const node = NODES[i];
+        const el = document.createElement('div');
+        el.className = 'card3d';
+        el.innerHTML = `
+            <div class="eyebrow">
+                <span>project ${String(i+1).padStart(2,'0')} / ${nn}</span>
+                <span class="coords">x${fmtCoord(node.x)} y${fmtCoord(node.y)} z${fmtCoord(node.z)}</span>
+            </div>
+            <h2>${proj.title}</h2>
+            <p>${proj.desc}</p>
+            <div class="tags">${proj.tags.map(t => `<span>${t}</span>`).join('')}</div>
+            <a class="visit" href="${proj.link}">view project →</a>`;
+        css3dCameraEl.appendChild(el);
+
+        // Orient the card to face the pose the camera visits for this node
+        helper.position.copy(node);
+        helper.lookAt(POSES[i + 1].pos);
+        helper.scale.set(scale, scale, scale);
+        helper.updateMatrixWorld(true);
+
+        // The card's own transform never changes, so bake it once.
+        el.style.transform = getObjectCSSMatrix(helper.matrixWorld);
+
+        css3dObjects.push({ el, worldPos: node.clone(), idx: i + 1 });
+    });
+}
+
+const _camDir = new THREE.Vector3();
+const _toCard = new THREE.Vector3();
+let debugEl;
+
+function buildDebugReadout() {
+    debugEl = document.createElement('div');
+    debugEl.id = 'debug-readout';
+    debugEl.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99;' +
+        'font:10px monospace;color:#8f8;background:rgba(0,0,0,0.6);' +
+        'padding:6px 8px;white-space:pre;pointer-events:none;';
+    document.body.appendChild(debugEl);
+}
+
+function updateCSS3D() {
+    if (!css3dContainer) return;
+    camera.updateMatrixWorld(true);
+
+    const fov = camera.projectionMatrix.elements[5] * heightHalf;
+    css3dContainer.style.perspective = fov + 'px';
+
+    const cameraCSSMatrix = 'translateZ(' + fov + 'px)' + getCameraCSSMatrix(camera.matrixWorldInverse);
+    css3dCameraEl.style.transform = cameraCSSMatrix + ' translate(' + widthHalf + 'px,' + heightHalf + 'px)';
+
+    let sample = '';
+    for (const c of css3dObjects) {
+        const d = Math.abs(progress - c.idx);
+        // Guaranteed fully invisible by the time you're a full section away
+        // (i.e. at the hero or contact bookends), with a steep, dramatic
+        // fade in between rather than a lingering ghost.
+        const o = Math.pow(Math.max(0, 1 - d), 1.8);
+        c.el.style.opacity = o.toFixed(3);
+        c.el.style.pointerEvents = o > 0.05 ? 'auto' : 'none';
+        if (c.idx === Math.round(progress) || sample === '') {
+            sample = `card idx=${c.idx} d=${d.toFixed(2)} opacity=${o.toFixed(2)}`;
+        }
+    }
+
+    if (debugEl) {
+        debugEl.textContent =
+            `cards: ${css3dObjects.length}\n` +
+            `progress: ${progress.toFixed(2)}\n` +
+            `fov(px): ${fov.toFixed(0)}\n` +
+            sample;
+    }
+}
+
 // ─── Sim step ────────────────────────────────────────────────────────────────
 let frameCount = 0;
 const frameSeed = new THREE.Vector2();
@@ -868,7 +1074,7 @@ function renderFrame() {
     trailUniforms.u_head.value = historyHead;
 
     // Scroll-driven camera with damping
-    const damp = reducedMotion ? 0.25 : 0.07;
+    const damp = reducedMotion ? 0.3 : 0.09;
     progress += (targetProgress - progress) * damp;
     poseAt(progress, _p, _l);
     camPos.lerp(_p, 1);
@@ -882,6 +1088,7 @@ function renderFrame() {
         camera.position.y += -mouseNY * 5;
     }
     camera.lookAt(camLook);
+    updateCSS3D();
 
     // hue drifts slowly as you descend
     trailUniforms.u_hueShift.value = progress * 0.06;
@@ -910,14 +1117,20 @@ function renderFrame() {
     postPass(compositeMesh, null);
 }
 
+// Camera path is a single smooth spline across every pose (hero → each
+// project → contact), sampled by uniform parameter t. This removes the
+// per-node "hard joint" that caused the sharp swings and stutter on
+// fast scroll — the whole ride now has one continuous curvature.
+function buildCameraCurves() {
+    posCurve  = new THREE.CatmullRomCurve3(POSES.map(p => p.pos.clone()),  false, 'catmullrom', 0.4);
+    lookCurve = new THREE.CatmullRomCurve3(POSES.map(p => p.look.clone()), false, 'catmullrom', 0.4);
+}
+
 function poseAt(p, outPos, outLook) {
     const max = POSES.length - 1;
-    p = Math.max(0, Math.min(max, p));
-    const i = Math.min(Math.floor(p), max - 1);
-    let t = p - i;
-    t = t * t * (3 - 2 * t);
-    outPos.lerpVectors(POSES[i].pos, POSES[i + 1].pos, t);
-    outLook.lerpVectors(POSES[i].look, POSES[i + 1].look, t);
+    const t = Math.max(0, Math.min(1, p / max));
+    posCurve.getPoint(t, outPos);
+    lookCurve.getPoint(t, outLook);
 }
 
 const _ray = new THREE.Vector3();
@@ -943,7 +1156,7 @@ function fmtCoord(v) {
     return (n < 0 ? '−' : '+') + String(Math.abs(n)).padStart(3, '0');
 }
 
-function buildDOM() {
+function buildDOM(fallback) {
     const content = document.getElementById('content');
     const rail = document.getElementById('rail');
     const nn = String(PROJECTS.length).padStart(2, '0');
@@ -952,17 +1165,22 @@ function buildDOM() {
         const node = NODES[i];
         const sec = document.createElement('section');
         sec.className = 'project' + (i % 2 ? ' right' : '');
-        sec.innerHTML = `
-            <div class="card">
-                <div class="eyebrow">
-                    <span>specimen ${String(i+1).padStart(2,'0')} / ${nn}</span>
-                    <span class="coords">x${fmtCoord(node.x)} y${fmtCoord(node.y)} z${fmtCoord(node.z)}</span>
-                </div>
-                <h2>${proj.title}</h2>
-                <p>${proj.desc}</p>
-                <div class="tags">${proj.tags.map(t => `<span>${t}</span>`).join('')}</div>
-                <a class="visit" href="${proj.link}">view specimen →</a>
-            </div>`;
+        // Normally these sections are just empty scroll spacers — the real
+        // card is a 3D object the camera flies to. Only if the WebGL sim
+        // can't run do we fall back to flat, in-flow cards here.
+        if (fallback) {
+            sec.innerHTML = `
+                <div class="card">
+                    <div class="eyebrow">
+                        <span>project ${String(i+1).padStart(2,'0')} / ${nn}</span>
+                        <span class="coords">x${fmtCoord(node.x)} y${fmtCoord(node.y)} z${fmtCoord(node.z)}</span>
+                    </div>
+                    <h2>${proj.title}</h2>
+                    <p>${proj.desc}</p>
+                    <div class="tags">${proj.tags.map(t => `<span>${t}</span>`).join('')}</div>
+                    <a class="visit" href="${proj.link}">view project →</a>
+                </div>`;
+        }
         content.appendChild(sec);
 
         const tick = document.createElement('div');
@@ -987,7 +1205,8 @@ function buildDOM() {
 const cards = [];
 function collectCards() {
     document.querySelectorAll('#content section').forEach((sec, i) => {
-        cards.push({ el: sec.querySelector('.card'), idx: i });
+        const el = sec.querySelector('.card');
+        if (el) cards.push({ el, idx: i }); // only hero + contact in the normal (non-fallback) path
     });
 }
 
@@ -1040,6 +1259,8 @@ function setupInput() {
     });
 
     addEventListener('resize', () => {
+        widthHalf = innerWidth / 2;
+        heightHalf = innerHeight / 2;
         if (!renderer || !sceneRT) return; // fallback path has no sim
         camera.aspect = innerWidth / innerHeight;
         camera.updateProjectionMatrix();
@@ -1053,6 +1274,8 @@ function setupInput() {
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
 function init() {
+    buildCameraCurves();
+
     scene    = new THREE.Scene();
     camera   = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 2000);
     renderer = new THREE.WebGLRenderer({ antialias: false });
@@ -1062,9 +1285,9 @@ function init() {
 
     const gl = renderer.getContext();
     if (!gl.getExtension('EXT_color_buffer_float')) {
-        // graceful fallback: static dark page, content still readable
+        // graceful fallback: static dark page, flat in-flow cards, still readable
         document.getElementById('container').remove();
-        return finishDOM();
+        return finishDOM(true);
     }
     gl.getExtension('OES_texture_float_linear');
 
@@ -1080,15 +1303,28 @@ function init() {
     buildDepositPoints();
     buildTrailMesh();
     buildPost();
-    finishDOM();
+    finishDOM(false);
     animate();
 }
 
-function finishDOM() {
-    buildDOM();
+function finishDOM(fallback) {
+    buildDOM(fallback);
+    if (!fallback) buildCSS3DCards();
+    buildDebugReadout();
     collectCards();
     setupInput();
 }
+
+// Surface any error directly on the page — this is a bare-bones site with
+// no build step, so this is the only "error console" the person will get.
+window.addEventListener('error', (e) => {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;' +
+        'background:#3a0d0d;color:#ffb4b4;font:12px monospace;padding:10px 14px;' +
+        'white-space:pre-wrap;border-bottom:1px solid #ff6b6b;';
+    banner.textContent = 'Script error: ' + e.message + '\n' + (e.filename ? e.filename + ':' + e.lineno : '');
+    document.body.appendChild(banner);
+});
 
 init();
 </script>
