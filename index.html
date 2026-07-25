@@ -10,7 +10,7 @@
 <style>
     :root {
         --ink:      #dce9e6;
-        --dim:      #61726f;
+        --dim:      #a5abaa;
         --accent:   #a5f3dd;
         --hairline: rgba(220, 233, 230, 0.14);
         --card-bg:  rgba(4, 8, 12, 0.62);
@@ -53,9 +53,12 @@
         display: flex; flex-direction: column; gap: 14px;
         font-size: 9px; letter-spacing: 0.1em; color: var(--dim);
         text-align: right;
+        pointer-events: auto;
     }
-    #rail .tick { display: flex; align-items: center; gap: 8px; justify-content: flex-end; transition: color 0.3s; }
+    #rail .tick { display: flex; align-items: center; gap: 8px; justify-content: flex-end; transition: color 0.3s; cursor: pointer; background: none; border: none; padding: 4px 0; font: inherit; color: inherit; letter-spacing: inherit; }
     #rail .tick .dash { display: inline-block; width: 10px; height: 1px; background: var(--dim); transition: width 0.3s, background 0.3s; }
+    #rail .tick:hover:not(.active) { color: var(--ink); }
+    #rail .tick:hover:not(.active) .dash { width: 16px; }
     #rail .tick.active { color: var(--accent); }
     #rail .tick.active .dash { width: 22px; background: var(--accent); }
 
@@ -113,8 +116,16 @@
     }
     .card::before { top: -1px; left: -1px; border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
     .card::after  { bottom: -1px; right: -1px; border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); }
-    .card.bare { background: none; border: none; backdrop-filter: none; -webkit-backdrop-filter: none; max-width: none; }
-    .card.bare::before, .card.bare::after { display: none; }
+    /* Hero and contact bookend the ride and sit right in front of dense sim
+       activity, so they get a stronger, wider frosted panel to actually
+       read against that — a plain "bare" background wasn't enough contrast. */
+    .card.bookend {
+        max-width: min(92vw, 760px);
+        padding: 46px clamp(28px, 6vw, 64px) 42px;
+        background: rgba(4, 8, 12, 0.4);
+        backdrop-filter: blur(7px);
+        -webkit-backdrop-filter: blur(14px);
+    }
     .card .eyebrow {
         display: flex; justify-content: space-between; gap: 12px;
         font-size: 9px; letter-spacing: 0.2em; color: var(--dim);
@@ -135,7 +146,7 @@
         border: 1px solid var(--hairline); padding: 3px 8px;
         text-transform: uppercase;
     }
-    .card a.visit {
+    .card .visit {
         display: inline-block; margin-top: 20px;
         font-size: 11px; letter-spacing: 0.1em;
         color: var(--accent); text-decoration: none;
@@ -144,6 +155,9 @@
         transition: border-color 0.2s;
     }
     .card a.visit:hover { border-color: var(--accent); }
+    .card .visit.no-link, .card3d .visit.no-link {
+        color: var(--dim); border-bottom-color: transparent; font-style: italic;
+    }
 
     /* ── in-scene project cards ──────────────────────────────────
        These live as real 3D objects the camera flies to; scrolling
@@ -193,7 +207,7 @@
         border: 1px solid var(--hairline); padding: 3px 8px;
         text-transform: uppercase;
     }
-    .card3d a.visit {
+    .card3d .visit {
         display: inline-block; margin-top: 20px;
         font-size: 11px; letter-spacing: 0.1em;
         color: var(--accent); text-decoration: none;
@@ -237,48 +251,41 @@
 <div id="chrome">
     <div id="header">
         <div class="name">william m.</div>
-        <div class="role">software · simulation · systems</div>
+        <div class="role">software · agentic ai · machine learning</div>
     </div>
     <div id="rail"></div>
 </div>
 
 <div id="content">
     <section id="hero">
-        <div class="card bare">
-            <div class="eyebrow">coding portflio</div>
+        <div class="card bookend">
+            <div class="eyebrow">coding portfolio</div>
             <h1>william m.</h1>
-            <div class="sub">idk what to put here</div>
+            <div class="sub">try moving your mouse around while inside</div>
         </div>
         <div class="scrollcue">scroll to explore</div>
     </section>
-    <!-- project sections generated from PROJECTS below -->
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
 
-/* ═══════════════════════════════════════════════════════════════════
-   EDIT YOUR CONTENT HERE
-   Everything below renders from this array. Replace the placeholders.
-   The mold treats each project as a food source and grows a network
-   between them — order determines the flight path top to bottom.
-   ═══════════════════════════════════════════════════════════════════ */
 const PROJECTS = [
-    { title: 'Project One',   desc: 'One or two sentences on what it is, why it exists, and the part you are proud of. Placeholder copy — replace me.', tags: ['webgl', 'simulation'],      link: '#' },
-    { title: 'Project Two',   desc: 'Placeholder. Concrete beats clever: what it does, who used it, one number if you have one.',                        tags: ['typescript', 'tooling'],    link: '#' },
-    { title: 'Project Three', desc: 'Placeholder description for the third project in the collection.',                                                 tags: ['systems'],                  link: '#' },
-    { title: 'Project Four',  desc: 'Placeholder description for the fourth project in the collection.',                                                tags: ['data', 'viz'],              link: '#' },
-    { title: 'Project Five',  desc: 'Placeholder description for the fifth project in the collection.',                                                 tags: ['audio'],                    link: '#' },
-    { title: 'Project Six',   desc: 'Placeholder description for the sixth project in the collection.',                                                 tags: ['ml'],                       link: '#' },
-    { title: 'Project Seven', desc: 'Placeholder description for the seventh project in the collection.',                                               tags: ['hardware', 'firmware'],     link: '#' },
+    { title: '3d Slimemold Simulation',   desc: "You're looking at it right now. GPU-accelerated slimemold-inspired 3d simulation, built on Three.js and WebGL. More fun settings on the GitHub page. ", tags: ['webgl', 'simulation'], link: 'https://github.com/William7042/3dSlimeMold' },
+    { title: 'ZoneMind',   desc: '2nd place @ Code4City Hackathon. AI-powered NYC rezoning policy simulator interpreting plain-English proposals and modeling citywide impact across 70,000+ Manhattan parcels via the MapPLUTO dataset', tags: ['StreamLit', 'GeoPandas','Claude API'],    link: 'https://github.com/William7042/ZoneMInd' },
+    { title: 'Kalshi 15 Minute Crypto Trading Bot', desc: 'Built and deployed an automated trader for 15-minute cryptocurrency up/down markets, generating $0.06 average realized profit per settled contract through real-time WebSocket execution and a custom fair-value distribution model composed of nine LightGBM quantile heads.',tags: ['LightGBM', 'Websockets'], link: '#' },
+    { title: 'Mitra: Safety-Gated Agentic Intake for Crisis Helplines',  desc: 'Built a crisis helpline intake agent (Python/FastAPI) using async FastAPI agentic pipeline with concurrent ML inference across ASR, NLP, and memory retrieval modules, serves as an early foundation for ongoing research with a graduate researcher.', tags: ['Research'], link: 'https://github.com/William7042/Mitra' },
+    { title: 'Leveraging Generative Adversarial Networks to Create Dynamic Training Environments for Model Agnostic Meta Learning Agents',  desc: 'Proposed a GAN-based curriculum that dynamically adapts maze difficulty to MAML agent performance; outperformed standard MAML by reducing average task-completion steps by 2.7 (regular mazes) and 2.2 (adaptive mazes) with statistically significant gains in ~58% of cases', tags: ['research'],link: 'https://github.com/William7042/GANMAML' },
+    
 ];
 const CONTACT = {
     heading: 'want to work on something together?',
     links: [
-        { label: 'email',  href: 'wjm16@hotmail.com' },
+        { label: 'email',  href: 'mailto:wjm16@hotmail.com' },
         { label: 'github', href: 'https://github.com/William7042' },
         { label: 'resume', href: '#' },
+        { label: 'linkedin', href: 'https://www.linkedin.com/in/william-ma-716753290/'}
     ],
 };
 
@@ -301,7 +308,7 @@ const config = {
 
 const GRID  = 64, COLS = 8, ATLAS = GRID * COLS;
 const HISTORY = 64, HCOLS = 8, HROWS = 8, RECORD_EVERY = 1;
-const WARMUP_FRAMES = 300; // sim runs 4× speed at first so the network forms fast
+const WARMUP_FRAMES = 100; // sim runs 4× speed at first so the network forms fast
 
 function agentTexSize(n) { return Math.ceil(Math.sqrt(n)); }
 
@@ -314,8 +321,9 @@ const NODES = PROJECTS.map((p, i) => {
 });
 
 // ─── Random blob spawn points: 7 big clusters scattered through the cube ───
-// Independent from the project nodes — agents start here, then the
-// pheromone attractors still pull the network toward each project over time.
+// Independent from the project nodes — agents start here and grow purely
+// organically from their own deposited trails. The cards no longer act as
+// pheromone attractors (that never read as natural, so it's gone).
 const SPAWN_POINTS = (() => {
     const hw = config.worldSize / 2 * 0.55; // keep clusters off the hard walls
     const pts = [];
@@ -352,8 +360,8 @@ let pheroFBO_A, pheroFBO_B, pheroRead, pheroWrite;
 let historyRT, historyHead = 0;
 let trailGeometry, trailMaterial, trailMesh, trailUniforms;
 let computeScene, computeCamera;
-let agentPosUniforms, agentDirUniforms, decayUniforms, copyUniforms;
-let agentPosMesh, agentDirMesh, decayMesh_, copyMesh;
+let agentPosUniforms, agentDirUniforms, decayUniforms, copyUniforms, spawnUniforms;
+let agentPosMesh, agentDirMesh, decayMesh_, copyMesh, spawnMesh;
 let depositScene, depositCamera, depositPoints, depositMat;
 let attractScene, attractPoints, attractMat;
 let sceneRT, blurRT_A, blurRT_B;
@@ -373,7 +381,7 @@ let widthHalf = innerWidth / 2, heightHalf = innerHeight / 2;
 let targetProgress = 0, progress = 0;
 const camPos = POSES[0].pos.clone(), camLook = POSES[0].look.clone();
 const _p = new THREE.Vector3(), _l = new THREE.Vector3();
-let mouseNX = 0, mouseNY = 0;
+let mouseNX = 0, mouseNY = 0, mouseActive = false;
 
 // Bait
 const baitPos = new THREE.Vector3(0, 0, 0);
@@ -391,6 +399,11 @@ precision highp float;
 varying vec2 vUv;
 uniform sampler2D u_tex;
 void main() { gl_FragColor = texture2D(u_tex, vUv); }`;
+
+const FRAG_SET_VALUE = `
+precision highp float;
+uniform vec4 u_value;
+void main() { gl_FragColor = u_value; }`;
 
 const SIM_COMMON = `
 precision highp float;
@@ -669,6 +682,29 @@ function blitToFBO(srcTex, targetFBO) {
     renderer.setRenderTarget(null);
 }
 
+// Overwrites a single texel of an agent FBO in place — used to relocate one
+// agent's position/direction to the cursor without touching the rest of the
+// texture. Must restore the render target's full viewport/scissor afterward,
+// since agentFBOs are also rendered to fullscreen every sim step.
+function writeAgentTexel(rt, ts, idx, v0, v1, v2, v3) {
+    const col = idx % ts, row = Math.floor(idx / ts);
+    rt.viewport.set(col, row, 1, 1);
+    rt.scissor.set(col, row, 1, 1);
+    rt.scissorTest = true;
+    spawnUniforms.u_value.value.set(v0, v1, v2, v3);
+    const oldAuto = renderer.autoClear;
+    renderer.autoClear = false;
+    computeScene.add(spawnMesh);
+    renderer.setRenderTarget(rt);
+    renderer.render(computeScene, computeCamera);
+    computeScene.remove(spawnMesh);
+    renderer.autoClear = oldAuto;
+    renderer.setRenderTarget(null);
+    rt.viewport.set(0, 0, ts, ts);
+    rt.scissor.set(0, 0, ts, ts);
+    rt.scissorTest = false;
+}
+
 function blitToHistoryTile(srcTex, tileIndex) {
     const ts  = agentTexSize_;
     const col = tileIndex % HCOLS;
@@ -698,9 +734,9 @@ function initAgentTextures() {
     const hw = config.worldSize / 2;
 
     for (let i = 0; i < n; i++) {
-        // Spawn in soft blobs around 7 randomly-placed points in the cube
+        //Spawn in soft blobs around randomly-placed points in the cube
         const node = SPAWN_POINTS[i % SPAWN_POINTS.length];
-        const radius = 38 * Math.pow(Math.random(), 0.45);
+        const radius = 15 * Math.pow(Math.random(), 0.45);
         const theta  = Math.random() * 2 * Math.PI;
         const phi    = Math.acos(2 * Math.random() - 1);
         const x = node.x + radius * Math.sin(phi) * Math.cos(theta);
@@ -801,23 +837,22 @@ function buildDepositPoints() {
     depositPoints = new THREE.Points(dGeo, depositMat);
     depositScene.add(depositPoints);
 
-    // Attractor cloud: (nodes + bait) × 5 z-slices each
+    // Attractor cloud: cursor bait only, × 5 z-slices. Project nodes used to
+    // deposit their own attractor pheromone here too, pulling the network
+    // toward each card — removed, since it fought the natural growth model.
     attractScene = new THREE.Scene();
-    const centers = NODES.length + 1;           // last slot = cursor bait
-    const pts = new Float32Array(centers * 5 * 3);
+    const pts = new Float32Array(5 * 3);
     let k = 0;
-    for (let c = 0; c < centers; c++) {
-        for (let z = -2; z <= 2; z++) {
-            pts[k*3]   = c;                     // center index
-            pts[k*3+1] = z;                     // z-offset in voxels
-            pts[k*3+2] = c === centers - 1 ? 1 : 0; // isBait
-            k++;
-        }
+    for (let z = -2; z <= 2; z++) {
+        pts[k*3]   = 0;  // center index (always the bait, slot 0)
+        pts[k*3+1] = z;  // z-offset in voxels
+        pts[k*3+2] = 1;  // isBait
+        k++;
     }
     const aGeo = new THREE.BufferGeometry();
     aGeo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
     const centerVecs = [];
-    for (let i = 0; i < 16; i++) centerVecs.push(i < NODES.length ? NODES[i] : baitPos);
+    for (let i = 0; i < 16; i++) centerVecs.push(baitPos);
     attractMat = new THREE.RawShaderMaterial({
         uniforms: {
             u_centers:   { value: centerVecs },
@@ -950,7 +985,7 @@ function buildCSS3DCards() {
             <h2>${proj.title}</h2>
             <p>${proj.desc}</p>
             <div class="tags">${proj.tags.map(t => `<span>${t}</span>`).join('')}</div>
-            <a class="visit" href="${proj.link}">view project →</a>`;
+            ${visitLinkHTML(proj)}`;
         css3dCameraEl.appendChild(el);
 
         // Orient the card to face the pose the camera visits for this node
@@ -968,16 +1003,6 @@ function buildCSS3DCards() {
 
 const _camDir = new THREE.Vector3();
 const _toCard = new THREE.Vector3();
-let debugEl;
-
-function buildDebugReadout() {
-    debugEl = document.createElement('div');
-    debugEl.id = 'debug-readout';
-    debugEl.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99;' +
-        'font:10px monospace;color:#8f8;background:rgba(0,0,0,0.6);' +
-        'padding:6px 8px;white-space:pre;pointer-events:none;';
-    document.body.appendChild(debugEl);
-}
 
 function updateCSS3D() {
     if (!css3dContainer) return;
@@ -989,7 +1014,6 @@ function updateCSS3D() {
     const cameraCSSMatrix = 'translateZ(' + fov + 'px)' + getCameraCSSMatrix(camera.matrixWorldInverse);
     css3dCameraEl.style.transform = cameraCSSMatrix + ' translate(' + widthHalf + 'px,' + heightHalf + 'px)';
 
-    let sample = '';
     for (const c of css3dObjects) {
         const d = Math.abs(progress - c.idx);
         // Guaranteed fully invisible by the time you're a full section away
@@ -998,17 +1022,6 @@ function updateCSS3D() {
         const o = Math.pow(Math.max(0, 1 - d), 1.8);
         c.el.style.opacity = o.toFixed(3);
         c.el.style.pointerEvents = o > 0.05 ? 'auto' : 'none';
-        if (c.idx === Math.round(progress) || sample === '') {
-            sample = `card idx=${c.idx} d=${d.toFixed(2)} opacity=${o.toFixed(2)}`;
-        }
-    }
-
-    if (debugEl) {
-        debugEl.textContent =
-            `cards: ${css3dObjects.length}\n` +
-            `progress: ${progress.toFixed(2)}\n` +
-            `fov(px): ${fov.toFixed(0)}\n` +
-            sample;
     }
 }
 
@@ -1096,6 +1109,7 @@ function renderFrame() {
     // bait decays until the mouse moves again
     baitStrength *= 0.96;
     updateBaitWorldPos();
+    trickleSpawn();
 
     updateContentOpacity();
 
@@ -1135,7 +1149,10 @@ function poseAt(p, outPos, outLook) {
 
 const _ray = new THREE.Vector3();
 function updateBaitWorldPos() {
-    if (baitStrength < 0.01) return;
+    if (!mouseActive) return;
+    // Keep tracking every frame, not just while the mouse is moving — the
+    // camera itself keeps flying through the scene on scroll, so the world
+    // point under a stationary cursor still needs to be re-projected.
     _ray.set(mouseNX, -mouseNY, 0.5).unproject(camera).sub(camera.position).normalize();
     const dist = camera.position.distanceTo(camLook);
     baitPos.copy(camera.position).addScaledVector(_ray, dist);
@@ -1145,15 +1162,67 @@ function updateBaitWorldPos() {
     baitPos.z = Math.max(-lim, Math.min(lim, baitPos.z));
 }
 
+let rafId = null;
+// The cursor continuously trickles new agents in at its last known position
+// by relocating random existing agents there, a few per frame — the
+// population stays fixed (the sim's textures are a fixed size) so every
+// "spawn" reads as a "delete" somewhere else. Runs at a flat rate once the
+// pointer has been used at all, moving or not — it's a steady drip at the
+// cursor, not something tied to how recently it moved.
+const TRICKLE_RATE   = Math.max(0.4, config.agentCount * 0.00003); // agents/frame
+const TRICKLE_JITTER = 0;
+let spawnAccum = 0, spawnedTotal = 0;
+
+function trickleSpawn() {
+    if (!agentTexRead_pos || !mouseActive) { spawnAccum = 0; return; }
+    spawnAccum += TRICKLE_RATE;
+    const ts = agentTexSize_;
+    while (spawnAccum >= 1) {
+        spawnAccum -= 1;
+        const idx = Math.floor(Math.random() * config.agentCount);
+        const x = baitPos.x + (Math.random()*2-1) * TRICKLE_JITTER;
+        const y = baitPos.y + (Math.random()*2-1) * TRICKLE_JITTER;
+        const z = baitPos.z + (Math.random()*2-1) * TRICKLE_JITTER;
+        let dx = Math.random()-0.5, dy = Math.random()-0.5, dz = Math.random()-0.5;
+        const len = Math.sqrt(dx*dx+dy*dy+dz*dz) || 1;
+        dx /= len; dy /= len; dz /= len;
+        const hue = (Math.atan2(dz, dx) + Math.PI) / (2 * Math.PI);
+        writeAgentTexel(agentTexRead_pos, ts, idx, x, y, z, hue);
+        writeAgentTexel(agentTexRead_dir, ts, idx, dx, dy, dz, 1);
+        spawnedTotal++;
+    }
+}
+
 function animate() {
-    requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
     renderFrame();
 }
+function stopAnimation() {
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+}
+function startAnimation() {
+    if (rafId === null && renderer) animate();
+}
+// Pause the whole sim while the tab is hidden — no point burning the GPU
+// (and the fans) on a background tab nobody's looking at.
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopAnimation();
+    else startAnimation();
+});
 
 // ─── DOM: build sections, rail, contact ──────────────────────────────────────
 function fmtCoord(v) {
     const n = Math.round(v);
     return (n < 0 ? '−' : '+') + String(Math.abs(n)).padStart(3, '0');
+}
+
+// Projects with no real link (link left as '#') get a plain, non-clickable
+// note instead of a dead link — e.g. private/closed-source projects.
+function visitLinkHTML(proj) {
+    if (proj.link && proj.link !== '#') {
+        return `<a class="visit" href="${proj.link}" target="_blank" rel="noopener noreferrer">view project →</a>`;
+    }
+    return `<span class="visit no-link">sorry, no link for this project</span>`;
 }
 
 function buildDOM(fallback) {
@@ -1178,24 +1247,30 @@ function buildDOM(fallback) {
                     <h2>${proj.title}</h2>
                     <p>${proj.desc}</p>
                     <div class="tags">${proj.tags.map(t => `<span>${t}</span>`).join('')}</div>
-                    <a class="visit" href="${proj.link}">view project →</a>
+                    ${visitLinkHTML(proj)}
                 </div>`;
         }
         content.appendChild(sec);
 
-        const tick = document.createElement('div');
+        const tick = document.createElement('button');
+        tick.type = 'button';
         tick.className = 'tick';
+        tick.setAttribute('aria-label', `jump to project ${i + 1}`);
         tick.innerHTML = `<span>${String(i+1).padStart(2,'0')}</span><span class="dash"></span>`;
+        tick.addEventListener('click', () => sec.scrollIntoView({ behavior: 'smooth', block: 'start' }));
         rail.appendChild(tick);
     });
 
     const contact = document.createElement('section');
     contact.id = 'contact';
     contact.innerHTML = `
-        <div class="card bare">
+        <div class="card bookend">
             <h2>${CONTACT.heading}</h2>
             <div class="links">
-                ${CONTACT.links.map(l => `<a href="${l.href}">${l.label}</a>`).join('')}
+                ${CONTACT.links.map(l => {
+                    const blank = !l.href.startsWith('mailto:');
+                    return `<a href="${l.href}"${blank ? ' target="_blank" rel="noopener noreferrer"' : ''}>${l.label}</a>`;
+                }).join('')}
             </div>
             <div class="fineprint">background organism: physarum polycephalum, simulated · ${config.agentCount.toLocaleString()} agents on your gpu</div>
         </div>`;
@@ -1240,6 +1315,7 @@ function setupInput() {
         mouseNX = (e.clientX / innerWidth) * 2 - 1;
         mouseNY = (e.clientY / innerHeight) * 2 - 1;
         baitStrength = 1;
+        mouseActive = true;
     }, { passive: true });
 
     addEventListener('touchmove', e => {
@@ -1247,6 +1323,7 @@ function setupInput() {
         mouseNX = (e.touches[0].clientX / innerWidth) * 2 - 1;
         mouseNY = (e.touches[0].clientY / innerHeight) * 2 - 1;
         baitStrength = 1;
+        mouseActive = true;
     }, { passive: true });
 
     addEventListener('keydown', e => {
@@ -1295,6 +1372,8 @@ function init() {
     computeCamera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
     copyUniforms  = { u_tex: { value: null } };
     copyMesh      = makeQuadMesh(copyUniforms, VERT_PASSTHROUGH, FRAG_COPY);
+    spawnUniforms = { u_value: { value: new THREE.Vector4() } };
+    spawnMesh     = makeQuadMesh(spawnUniforms, VERT_PASSTHROUGH, FRAG_SET_VALUE);
 
     initAgentTextures();
     initHistory();
@@ -1304,13 +1383,12 @@ function init() {
     buildTrailMesh();
     buildPost();
     finishDOM(false);
-    animate();
+    if (!document.hidden) animate();
 }
 
 function finishDOM(fallback) {
     buildDOM(fallback);
     if (!fallback) buildCSS3DCards();
-    buildDebugReadout();
     collectCards();
     setupInput();
 }
